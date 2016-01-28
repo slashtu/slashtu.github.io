@@ -9,6 +9,19 @@ body {
 .lpm-heading-color {
   color: #5fb0ea; }
 
+.social-icons-container {
+  background-color: #FF551A;
+  height: 43px;
+  min-width: 43px;
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell; }
+
+.social-icons {
+  color: white;
+  font-size: 1.5em; }
+
 /* layout */
 .lpm-page {
   -moz-box-shadow: none;
@@ -54,6 +67,19 @@ body {
     float: none;
     vertical-align: middle; } }
 
+/* fixed header */
+.lpm-page-header-fixed {
+  width: 100%;
+  left: 0px;
+  position: fixed;
+  z-index: 1;
+  display: none;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.1); }
+
+.lpm-page-header-fixed img {
+  max-height: 46px !important;
+  width: auto !important; }
+
 .lpm-content {
   padding: 0px; }
 
@@ -85,10 +111,6 @@ body {
 .lpm-row {
   padding-bottom: 40px; }
 
-@media (max-width: 767px) {
-  .lpm-row-content {
-    margin: 20px; } }
-
 .lpm-page-footer-widgets {
   border-top: 1px solid #e6e6e6;
   border-color: #2d424f;
@@ -104,6 +126,17 @@ body {
   border-color: #273a44;
   background-color: #0f161a;
   color: #ffffff; }
+
+.lpm-footer-icons-row > div {
+  margin-top: 5px;
+  margin-bottom: 5px; }
+
+@media (max-width: 767px) {
+  .lpm-footer-icons-row {
+    width: 400px; } }
+@media (min-width: 768px) {
+  .lpm-footer-icons-row {
+    max-width: 165px; } }
 
 /* component */
 .lpm-btn-sm {
@@ -185,6 +218,14 @@ body {
       border: none;
       margin-left: 0;
       margin-right: 0; } }
+
+.header-nav-sub-menu {
+  display: none;
+  position: absolute;
+  z-index: 1; }
+  @media (max-width: 767px) {
+    .header-nav-sub-menu {
+      position: static; } }
 
 /*-----------Vertical tabs----------- */
 ul.lpm-accordion-tabs {
@@ -273,6 +314,9 @@ h2.resp-tab-active {
   background-position: center top;
   background-attachment: scroll;
   background-size: cover; }
+  @media (max-width: 767px) {
+    .course-main-photo {
+      min-height: 275px; } }
 
 .lpm-footer-widgets-menu {
   list-style: none; }
