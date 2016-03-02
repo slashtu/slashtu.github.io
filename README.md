@@ -1,2 +1,2 @@
 # slashtu.github.io
-test
+projects for demo
