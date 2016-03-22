@@ -108,7 +108,7 @@
       renderer.setSize( window.innerWidth - 10, window.innerHeight - 10 );
       document.body.appendChild( renderer.domElement );
 
-      var geometry = new THREE.SphereGeometry( 100, 32, 32);
+      var geometry = new THREE.SphereGeometry( 5, 32, 32);
       var material = new THREE.MeshPhongMaterial({
                       
                           map: THREE.ImageUtils.loadTexture('images/Earth.png'),
@@ -126,11 +126,11 @@
       light.position.set(5,3,5);
       //scene.add(light);
 
-      camera.position.z = 5;
+      camera.position.z = 50;
 
       // galaxy
       var galaxy = new THREE.Mesh(
-        new THREE.SphereGeometry(90, 64, 64), 
+        new THREE.SphereGeometry(1, 64, 64), 
         new THREE.MeshBasicMaterial({
           map: THREE.ImageUtils.loadTexture('images/starfield.jpg'), 
           side: THREE.BackSide
@@ -140,7 +140,7 @@
       // scene.add(galaxy);
 
       // add line
-      addTrack( 6, 31, 10, 50, 10, 0.5);
+      // addTrack( 6, 31, 10, 50, 10, 0.5);
 
       var controls = new THREE.TrackballControls(camera);
 
@@ -154,8 +154,8 @@
         renderer.render(scene, camera);
       };
 
-       camera.position.set(0, 0, 100);
-      camera.lookAt(new THREE.Vector3(0, 0, 0));
+       // camera.position.set(0, 0, 100);
+      // camera.lookAt(new THREE.Vector3(0, 0, 0));
 
       render();
 
