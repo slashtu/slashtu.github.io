@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>My first Three.js app</title>
+    <style>
+      body { margin: 0; }
+      canvas { width: 100%; height: 100% }
+    </style>
+  </head>
+  <body>
+    <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="js/TrackballControls.js"></script>
+    <script src="js/latling.js"></script>
+    <script>
+
+
+      function addTrackLine(spline, hue) {
+
+        var material = new THREE.LineBasicMaterial({
+        color: 0x0000ff
+    });
+
+        console.log(spline.points)
+
+        var geometry = new THREE.Geometry();
+
+    //      geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+    // geometry.vertices.push(new THREE.Vector3(0, 10, 0));
+    // geometry.vertices.push(new THREE.Vector3(10, 0, 0));
+
+        geometry.vertices.push( spline.points[0]);
+        geometry.vertices.push( spline.points[1]);
+        geometry.vertices.push( spline.points[2]);
+        geometry.vertices.push( spline.points[3]);
+        geometry.vertices.push( spline.points[4]);
+        geometry.vertices.push( spline.points[5]);
+        geometry.vertices.push( spline.points[6]);
+        geometry.vertices.push( spline.points[7]);
+
+        var line = new THREE.Line(geometry, material);
+
+        scene.add(line);
+
+        // console.log(spline)
+        // var num_control_points = 32;
+        // var i;
+        // var colors = [];
+        // var geometry = new THREE.Geometry();
+        // var pos;
+
+        // for (i = 0; i < num_control_points; i++) {
+        //   var index = i / num_control_points;
+        //   pos = spline.getPoint(index);
+
+        //   colors[i] = new THREE.Color(0xffffff);
+        //   // colors[i].setHSV(hue, (1.0 - i / num_control_points), 1.0);
+
+        //   geometry.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
+        // }
+        // pos = spline.getPoint(1.0);
+        // geometry.vertices.push(new THREE.Vector3(pos.x, pos.y, pos.z));
+
+        // geometry.colors = colors;
+
+        // var material = new THREE.LineBasicMaterial({
+        //   color: 0xffffff,
+        //   opacity: 1,
+        //   linewidth: 2
+        // });
+        // material.vertexColors = true;
+
+        // var line = new THREE.Line(geometry, material);
+
+        // line.name = "trackline";
+        // cube.add(line);
+      }
+
+      function addTrack(start_lat, start_lng, end_lat, end_lng, radius, hue) {
+        var num_control_points = 8;
+        var max_altitude = 500 + Math.random() * 1200;
+
+        var points = [];
+        var i;
+        for (i = 0; i < num_control_points + 1; i++) {
+          var arc_angle = i * 180.0 / num_control_points;
+
+          var arc_radius = radius + (Math.sin(latlngDeg2rad(arc_angle))) * max_altitude;
+        
+
+          var latlng = latlngInterPoint(start_lat, start_lng, end_lat, end_lng, i / num_control_points);
+          var pos = latlngPosFromLatLng(latlng.lat, latlng.lng, arc_radius);
+
+          points.push(new THREE.Vector3(pos.x, pos.y, pos.z));
+        }
+
+        var spline = new THREE.SplineCurve3(points);
+
+        addTrackLine(spline, hue);
+      }
+
+      var fov = 60;
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera( 15, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth - 10, window.innerHeight - 10 );
+      document.body.appendChild( renderer.domElement );
+
+      var geometry = new THREE.SphereGeometry( 100, 32, 32);
+      var material = new THREE.MeshPhongMaterial({
+                      
+                          map: THREE.ImageUtils.loadTexture('images/Earth.png'),
+                          
+           
+                  
+                          specular: new THREE.Color('grey')      })
+      var cube = new THREE.Mesh( geometry, material );
+      scene.add( cube );
+
+      scene.add(new THREE.AmbientLight(0x333333, 5));
+
+      // light
+      var light = new THREE.DirectionalLight(0xffffff, 0.5);
+      light.position.set(5,3,5);
+      //scene.add(light);
+
+      camera.position.z = 5;
+
+      // galaxy
+      var galaxy = new THREE.Mesh(
+        new THREE.SphereGeometry(90, 64, 64), 
+        new THREE.MeshBasicMaterial({
+          map: THREE.ImageUtils.loadTexture('images/starfield.jpg'), 
+          side: THREE.BackSide
+        })
+      );
+
+      // scene.add(galaxy);
+
+      // add line
+      addTrack( 6, 31, 10, 50, 10, 0.5);
+
+      var controls = new THREE.TrackballControls(camera);
+
+      var render = function () {
+        controls.update();
+        requestAnimationFrame( render );
+
+        // cube.rotation.x += 0.01;
+        cube.rotation.y += 0.001;
+
+        renderer.render(scene, camera);
+      };
+
+       camera.position.set(0, 0, 100);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+      render();
+
+      // window.addEventListener('mousewheel', mousewheel, false);
+
+      function mousewheel( event ){
+        fov -= event.wheelDeltaY * 0.05;
+        console.log(fov)
+
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+      }
+
+
+    </script>
+  </body>
+</html>

@@ -10,6 +10,7 @@
   </head>
   <body>
     <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="https://rawgit.com/mrdoob/three.js/master/examples/js/controls/TrackballControls.js"></script>
     <script>
 
       var fov = 60;
@@ -21,13 +22,21 @@
       renderer.setSize( window.innerWidth, window.innerHeight );
       document.body.appendChild( renderer.domElement );
 
-      var geometry = new THREE.SphereGeometry(0.5, 10, 10);
-      var material = new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading }); 
+      var geometry = new THREE.SphereGeometry(0.5, 32, 32);
+      var material = new THREE.MeshPhongMaterial({
+        
+                          map: THREE.ImageUtils.loadTexture('images/5_night_8k.jpg'),
+                          
+           
+                  
+                          specular: new THREE.Color('grey')      })
       var cube = new THREE.Mesh( geometry, material );
       scene.add( cube );
 
-      var light = new THREE.DirectionalLight( 0xffffff );
-      light.position.set( 1, 1, 1 ).normalize();
+      scene.add(new THREE.AmbientLight(0x333333));
+
+      var light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5,3,5);
       scene.add(light);
 
       camera.position.z = 5;
