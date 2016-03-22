@@ -9,9 +9,9 @@
     </style>
   </head>
   <body>
-    <script src="http://threejs.org/build/three.min.js"></script>
-    <script src="js/TrackballControls.js"></script>
-    <script src="js/latling.js"></script>
+    <script src="public/js/three.min.js"></script>
+    <script src="public/js/TrackballControls.js"></script>
+    <script src="public/js/latling.js"></script>
     <script>
 
 
@@ -111,7 +111,7 @@
       var geometry = new THREE.SphereGeometry( 5, 32, 32);
       var material = new THREE.MeshPhongMaterial({
                       
-                          map: THREE.ImageUtils.loadTexture('images/Earth.png'),
+                          map: THREE.ImageUtils.loadTexture('public/images/Earth.png'),
                           
            
                   
@@ -129,13 +129,13 @@
       camera.position.z = 50;
 
       // galaxy
-      var galaxy = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 64, 64), 
-        new THREE.MeshBasicMaterial({
-          map: THREE.ImageUtils.loadTexture('images/starfield.jpg'), 
-          side: THREE.BackSide
-        })
-      );
+      // var galaxy = new THREE.Mesh(
+      //   new THREE.SphereGeometry(1, 64, 64), 
+      //   new THREE.MeshBasicMaterial({
+      //     map: THREE.ImageUtils.loadTexture('images/starfield.jpg'), 
+      //     side: THREE.BackSide
+      //   })
+      // );
 
       // scene.add(galaxy);
 
