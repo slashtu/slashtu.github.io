@@ -20967,7 +20967,7 @@
 	
 				var width = $(document).width();
 	
-				if (width > 1000) {
+				if (width > 99999) {
 	
 					return _react2['default'].createElement(_DesktopApp2['default'], null);
 				} else {
@@ -21294,9 +21294,10 @@
 	                // https://code.flickr.net/2014/04/30/flickr-api-going-ssl-only-on-june-27th-2014/
 	                url: 'https://api.flickr.com/services/rest/',
 	                data: {
+	                    user_id: '142478112@N07',
 	                    format: 'json',
-	                    method: 'flickr.interestingness.getList',
-	                    api_key: '7617adae70159d09ba78cfec73c13be3' // jshint ignore:line
+	                    method: 'flickr.people.getPhotos',
+	                    api_key: '7aa3ef388299f4637883fc3f2398b76a' // jshint ignore:line
 	                },
 	                dataType: 'jsonp',
 	                jsonp: 'jsoncallback'
@@ -21307,7 +21308,7 @@
 	                // Add the demo images as links with thumbnails to the page:
 	                $.each(result.photos.photo, function (index, photo) {
 	                    baseUrl = 'https://farm' + photo.farm + '.static.flickr.com/' + photo.server + '/' + photo.id + '_' + photo.secret;
-	                    $('<a/>').append($('<img>').prop('src', baseUrl + '_s.jpg').prop('class', 'small')).prop('href', baseUrl + '_b.jpg').prop('title', photo.title).attr('data-gallery', '').appendTo(linksContainer);
+	                    $('<a/>').append($('<img>').prop('src', baseUrl + '_q.jpg').prop('class', 'small')).prop('href', baseUrl + '_b.jpg').prop('title', photo.title).attr('data-gallery', '').appendTo(linksContainer);
 	                    carouselLinks.push({
 	                        href: baseUrl + '_c.jpg',
 	                        title: photo.title
