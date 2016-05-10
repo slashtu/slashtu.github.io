@@ -2,3 +2,15 @@
 	width: 150px;
   height: 150px;
 }
+
+.title{
+  visibility: hidden;
+}
+
+.prev{
+  left: 40px !important;
+}
+
+.next{
+  right: 40px !important;
+}
