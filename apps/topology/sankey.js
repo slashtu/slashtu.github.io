@@ -53,7 +53,7 @@ d3.sankey = function() {
     computeNodeLinks();
  
     // computeNodeValues();
-    console.log(links)
+    // console.log(links)
     computeNodeBreadths();
     computeNodeDepths();
     // computeNodeDepths(iterations);
@@ -68,10 +68,10 @@ d3.sankey = function() {
   };
 
   sankey.link = function() {
-    var curvature = .3;
+    var curvature = .2;
 
     function link(d) {
-      console.log(d)
+      // console.log(d)
       var x0 = d.source.x,
           x1 = d.target.x,
           xi = d3.interpolateNumber(x0, x1),
@@ -142,28 +142,6 @@ d3.sankey = function() {
     // console.log(nodes)
   }
 
-  function moveSourcesRight() {
-    nodes.forEach(function(node) {
-      if (!node.targetLinks.length) {
-        node.x = d3.min(node.sourceLinks, function(d) { return d.target.x; }) - 1;
-      }
-    });
-  }
-
-  function moveSinksRight(x) {
-    nodes.forEach(function(node) {
-      if (!node.sourceLinks.length) {
-        node.x = x - 1;
-      }
-    });
-  }
-
-  function scaleNodeBreadths(kx) {
-    nodes.forEach(function(node) {
-      node.x *= kx;
-    });
-  }
-
   function computeNodeDepths(iterations) {
     var depth = 0;
     // var breadth = (width - nodeRadius * 2)/(column - 1);
@@ -173,32 +151,6 @@ d3.sankey = function() {
 
        node.y = (node.row + 1) * depth;
     });
-  }
-
-  function computeLinkDepths() {
-    nodes.forEach(function(node) {
-      node.sourceLinks.sort(ascendingTargetDepth);
-      node.targetLinks.sort(ascendingSourceDepth);
-    });
-    nodes.forEach(function(node) {
-      var sy = 0, ty = 0;
-      node.sourceLinks.forEach(function(link) {
-        link.sy = sy;
-        sy += link.dy;
-      });
-      node.targetLinks.forEach(function(link) {
-        link.ty = ty;
-        ty += link.dy;
-      });
-    });
-
-    function ascendingSourceDepth(a, b) {
-      return a.source.y - b.source.y;
-    }
-
-    function ascendingTargetDepth(a, b) {
-      return a.target.y - b.target.y;
-    }
   }
 
   function center(node) {

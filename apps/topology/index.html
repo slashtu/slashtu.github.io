@@ -30,6 +30,20 @@
   stroke-opacity: .5;
 }
 
+.linkmask {
+  fill: none;   
+  stroke: transparent;
+  pointer-events: stroke;
+}
+
+.linkmask:hover {
+  stroke-opacity: .5;
+}
+
+.linkgroup:hover > path{
+  stroke-opacity: .5;
+}
+
 </style>
 <body>
 
@@ -50,7 +64,7 @@
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
     width = 800 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 900 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.0f"),
     format = function(d) { return formatNumber(d) + " TWh"; },
@@ -63,7 +77,7 @@ var svg = d3.select("#chart").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var sankey = d3.sankey()
-    .nodeRadius(20)
+    .nodeRadius(10)
     .nodePadding(10)
     .size([width, height]);
 
@@ -71,31 +85,46 @@ var path = sankey.link();
 
 // sankey.debug();
 
-d3.json("other.json", function(energy) {
+d3.json("nxg.json", function(energy) {
 
   sankey
       .nodes(energy.nodes)
       .links(energy.links)
-      .layout([3,2,4]);
-
-  var line = d3.svg.line()
-      .x(function(d){
-        console.log(d)
-        return d.x})
-      .y(function(d){return d.y})
+      .layout([12, 28, 17]);
 
   var link = svg.append("g")
       .attr("class", "links")
       .selectAll(".link")
       .data(energy.links)
-      .enter().append("path")
+      .enter().append("g")
+      .attr("class", "linkgroup")
+
+  link.append("path")
       .attr("class", "link")
       .attr("d", path)
       .style("stroke-width", function(d) { return 2; })
-      .sort(function(a, b) { return b.dy - a.dy; });
+      // .sort(function(a, b) { return b.dy - a.dy; });
+
+
+  link.append("path")
+    .attr("class", "linkmask")
+    .attr("d", path)
+    .style("stroke-width", function(d) { return 10; })
+
+  // link.append("title")
+  //     .text(function(d) { return 'name'});
 
   // link.append("title")
   //     .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + format(d.value); });
+
+  var labels = svg.append("g")
+      .attr("class", "labelgroup")
+      .selectAll(".labels")
+      .data(energy.nodes)
+      .enter().append("text")
+      .attr("class", "name")
+      .attr("transform", function(d) { return "translate(" + (d.x + 20) + "," + (d.y+ 5) + ")"; })
+      .text(function(d){ return d.name})
 
   var node = svg.append("g")
       .attr("class", "nodes")
@@ -106,8 +135,9 @@ d3.json("other.json", function(energy) {
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       // .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
 
+
   node.append("circle")
-      .attr("r", "20")
+      .attr("r", "10")
       // .attr("height", function(d) { return d.dy; })
       // .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
