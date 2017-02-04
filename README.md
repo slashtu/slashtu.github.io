@@ -1,5 +1,5 @@
-## [Web App Monitoring](slashtu.github.io/apps/appmonitor/)
-Data Visualization
+## [Web App Monitoring](http://slashtu.github.io/apps/appmonitor/)
+Data Visualization - SPA
 
 ## [Topology Diagram by D3.js](http://slashtu.github.io/apps/topologyDiagram/)
 Topology Diagram
