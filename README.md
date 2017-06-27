@@ -1,4 +1,4 @@
-## [Facebook Travel](https://slash.tw/app/fb-travel)
+## Facebook Travel
 List your tagged places on facebook and show world map
 
 ## [Web App Monitoring](http://slashtu.github.io/apps/appmonitor/)
