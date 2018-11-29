@@ -1,4 +1,4 @@
-## [Animal Adoption](https://github.com/slashtu/react-loadable-ssr)
+## [Animal adoption](https://github.com/slashtu/react-loadable-ssr)
 Redux SSR and Code Splitting by Component-based
 
 ## Facebook Travel
