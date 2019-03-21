@@ -1,6 +1,3 @@
-## [Animal adoption](https://github.com/slashtu/react-loadable-ssr)
-An adoption web app for Redux SSR and Code Splitting by Component-based
-
 ## Facebook Travel
 List your tagged places on facebook and show world map
 
