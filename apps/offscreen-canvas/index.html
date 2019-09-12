@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WebGL</title>
+    <style></style>
+  </head>
+  <body>
+    <canvas id="canvas" height="600" width="800"></canvas>
+    <div style="display:none;">
+      <img id="source" src="ic_diamond.svg" width="300" height="227" />
+    </div>
+    <div id="counter">0</div>
+    <button id="button">Chat Room<button>
+  </body>
+  <script>
+    const htmlCanvas = document.getElementById('canvas');
+    const offscreen = htmlCanvas.transferControlToOffscreen();
+    // const ctx = htmlCanvas.getContext('2d');
+    const image = document.getElementById('source');
+    const counter = document.getElementById('counter');
+    const button = document.getElementById('button');
+    const diamonds = [];
+
+    const worker = new Worker("worker.js"); 
+    
+
+
+    const paths = [
+      { x: 1, y: -1 },
+      { x: -1, y: -1 },
+      { x: 0, y: -1 },
+      { x: 1, y: -2 },
+      { x: -1, y: -2 },
+      { x: 0, y: -2 },
+      { x: 1, y: -3 },
+      { x: -1, y: -3 },
+      { x: 0, y: -3 },
+      { x: 1, y: -4 },
+      { x: -1, y: -4 },
+      { x: 0, y: -4 },
+    ];
+
+    button.addEventListener('click', (e) => {
+      for(let i = 0; i < 100000 ; i++){
+        counter.innerHTML = parseInt(counter.textContent, 10) + 1;
+      }
+    })
+
+    const animation = () => {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      diamonds.forEach(d => {
+        ctx.drawImage(image, d.x, d.y);
+
+        const pick = paths[~~((Math.random() * 10) % 12)];
+
+        d.x += pick.x;
+        d.y += pick.y;
+
+        if (d.y < 0) {
+          d.x = 600;
+          d.y = 500;
+        }
+      });
+
+      window.requestAnimationFrame(animation);
+    };
+
+    const createDiamond = n => {
+      for (let i = 0; i < n; i++) {
+        diamonds.push({ x: 600, y: 500 });
+      }
+    };
+
+    image.addEventListener('load', e => {
+      const imageBitmapPromise = createImageBitmap(image);
+      imageBitmapPromise.then(bit => {
+        worker.postMessage({canvas: offscreen, bit}, [offscreen]);
+      });
+      // worker.postMessage({canvas: offscreen}, [offscreen]);
+      
+      // setInterval(() => createDiamond(), 10);
+      // createDiamond(100);
+      // animation();
+    });
+  </script>
+</html>

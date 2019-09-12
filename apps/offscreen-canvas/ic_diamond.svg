@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_purchase_diamond</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="ICON" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-648.000000, -189.000000)">
+        <g id="ic_purchase_diamond" transform="translate(648.000000, 189.000000)">
+            <g id="Group" transform="translate(0.000000, 2.750000)">
+                <polygon id="Fill-1" fill="#00E6D2" points="6.12382222 0.916468056 1.2223619 7.73429097 10.9642878 16.8053569 10.9642878 16.8048604 10.9642878 16.8053569 20.7062138 7.73429097 15.8047534 0.916468056"></polygon>
+                <polygon id="Fill-2" fill="#00E6D2" points="6.12382222 0.916468056 1.2223619 7.73429097 8.20043598 7.73429097"></polygon>
+                <polygon id="Fill-3" fill="#3EFFEE" points="6.12382222 0.916468056 8.20043598 7.73429097 13.7276741 7.73429097 14.5978963 4.87826319"></polygon>
+                <polygon id="Fill-4" fill="#2BB7B3" points="1.22222222 7.73443993 10.9641481 16.8055059 10.9641481 16.8050094 8.2007619 7.73443993"></polygon>
+                <polygon id="Fill-5" fill="#00E6D2" points="8.20062222 7.73443993 10.9644741 16.8050094 13.7273947 7.73443993"></polygon>
+                <polygon id="Fill-6" fill="#00E6D2" points="13.7274413 7.73443993 20.7064466 7.73443993 14.5976635 4.87841215"></polygon>
+                <polygon id="Fill-7" fill="#2BB7B3" points="13.7274413 7.73443993 10.964055 16.8050094 10.964055 16.8055059 20.7064466 7.73443993"></polygon>
+                <polygon id="Fill-8" fill="#3EFFEE" points="6.12382222 0.916468056 14.5978963 4.87826319 15.8047534 0.916468056"></polygon>
+                <polygon id="Fill-9" fill="#00E6D2" points="15.8046603 0.916468056 14.5978032 4.87826319 20.7061206 7.73429097"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
