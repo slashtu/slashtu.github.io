@@ -1,10 +1,6 @@
 let ctx = null;
 let image = null;
 const diamonds = [];
-// var x = new Image(100, 200);
-// x.setAttribute('src', 'ic_diamond.svg');
-// x.setAttribute('width', '100');
-// x.setAttribute('height', '100');
 
 const paths = [
   { x: 1, y: -1 },
@@ -32,7 +28,7 @@ const animation = () => {
     d.y += pick.y;
 
     if (d.y < 0) {
-      d.x = 600;
+      d.x = 500;
       d.y = 500;
     }
   });
@@ -42,7 +38,7 @@ const animation = () => {
 
 const createDiamond = n => {
   for (let i = 0; i < n; i++) {
-    diamonds.push({ x: 600, y: 500 });
+    diamonds.push({ x: 500, y: 500 });
   }
 };
 
@@ -50,8 +46,8 @@ onmessage = function(evt) {
   this.console.log(evt.data);
   var canvas = evt.data.canvas;
   ctx = canvas.getContext('2d');
-  image = evt.data.bit;
+  image = evt.data.image;
 
-  createDiamond(10);
+  createDiamond(100);
   animation();
 };

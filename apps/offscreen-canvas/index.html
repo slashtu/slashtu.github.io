@@ -3,28 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <title>WebGL</title>
-    <style></style>
+    <style>
+      .comparison {
+        display: flex;
+        justify-content: space-evenly;
+      }
+      .container{
+        border: 1px solid;
+      }
+      .busy {
+        text-align: center;
+        margin: 30px;
+        font-size: 30px;
+      }
+
+      #button {
+        font-size: 20px;
+        width: 200px;
+        height: 54px;
+      }
+    </style>
   </head>
   <body>
-    <canvas id="canvas" height="600" width="800"></canvas>
+    </div>
+    <div class="busy">
+      <div id="counter">0</div>
+      <button id="button">Make Busy</button>
+    </div>
+    <div class="comparison">
+      <div class="container"><canvas id="canvasleft" height="600" width="600"></canvas></div>
+      <div class="container"><canvas id="canvasright" height="600" width="600"></canvas></div>
+    </div>
+    
     <div style="display:none;">
       <img id="source" src="ic_diamond.svg" width="300" height="227" />
-    </div>
-    <div id="counter">0</div>
-    <button id="button">Chat Room<button>
+
   </body>
   <script>
-    const htmlCanvas = document.getElementById('canvas');
-    const offscreen = htmlCanvas.transferControlToOffscreen();
-    // const ctx = htmlCanvas.getContext('2d');
-    const image = document.getElementById('source');
+    const canvasLeft = document.getElementById('canvasleft');
+    const canvasRight = document.getElementById('canvasright');
+    const ctx = canvasLeft.getContext('2d');
+    const offscreen = canvasRight.transferControlToOffscreen();
+    const diamondImage = document.getElementById('source');
     const counter = document.getElementById('counter');
     const button = document.getElementById('button');
     const diamonds = [];
 
     const worker = new Worker("worker.js"); 
-    
-
 
     const paths = [
       { x: 1, y: -1 },
@@ -42,7 +67,7 @@
     ];
 
     button.addEventListener('click', (e) => {
-      for(let i = 0; i < 100000 ; i++){
+      for(let i = 0; i < 5000 ; i++){
         counter.innerHTML = parseInt(counter.textContent, 10) + 1;
       }
     })
@@ -50,7 +75,7 @@
     const animation = () => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       diamonds.forEach(d => {
-        ctx.drawImage(image, d.x, d.y);
+        ctx.drawImage(diamondImage, d.x, d.y);
 
         const pick = paths[~~((Math.random() * 10) % 12)];
 
@@ -58,7 +83,7 @@
         d.y += pick.y;
 
         if (d.y < 0) {
-          d.x = 600;
+          d.x = 500;
           d.y = 500;
         }
       });
@@ -68,20 +93,18 @@
 
     const createDiamond = n => {
       for (let i = 0; i < n; i++) {
-        diamonds.push({ x: 600, y: 500 });
+        diamonds.push({ x: 500, y: 500 });
       }
     };
 
-    image.addEventListener('load', e => {
-      const imageBitmapPromise = createImageBitmap(image);
-      imageBitmapPromise.then(bit => {
-        worker.postMessage({canvas: offscreen, bit}, [offscreen]);
+    diamondImage.addEventListener('load', e => {
+      const imageBitmapPromise = createImageBitmap(diamondImage);
+      imageBitmapPromise.then(image => {
+        worker.postMessage({canvas: offscreen, image}, [offscreen]);
       });
-      // worker.postMessage({canvas: offscreen}, [offscreen]);
-      
-      // setInterval(() => createDiamond(), 10);
-      // createDiamond(100);
-      // animation();
+    
+      createDiamond(100);
+      animation();
     });
   </script>
 </html>
