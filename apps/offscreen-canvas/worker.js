@@ -20,7 +20,7 @@ const paths = [
 const animation = () => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   diamonds.forEach(d => {
-    ctx.drawImage(image, d.x, d.y);
+    ctx.drawImage(image, d.x, d.y, 30, 30);
 
     const pick = paths[~~((Math.random() * 10) % 12)];
 

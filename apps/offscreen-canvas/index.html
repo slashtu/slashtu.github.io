@@ -9,30 +9,60 @@
         justify-content: space-evenly;
       }
       .container{
+        position: relative;
         border: 1px solid;
       }
       .busy {
-        text-align: center;
-        margin: 30px;
+        display: flex;
+        justify-content: center;
         font-size: 30px;
+        padding: 15px;
+        text-align: center;
       }
 
-      #button {
+      .busy > div {
+        margin-right: 35px;
+      }
+
+      .busy button {
         font-size: 20px;
         width: 200px;
         height: 54px;
+      }
+
+      .diamond {
+        position: absolute;
+        right: 34px;
+        bottom: 29px;
+        z-index: -1;
       }
     </style>
   </head>
   <body>
     </div>
     <div class="busy">
-      <div id="counter">0</div>
-      <button id="button">Make Busy</button>
+      <div >
+        <div id="counter1">0</div>
+        <button id="button1">Make Busy</button>
+      </div>
+      <div >
+        <div id="counter2">0</div>
+        <button id="button2">Make Busy</button>
+      </div>
+      <div >
+        <div id="counter3">0</div>
+        <button id="button3">Make Busy</button>
+      </div>
     </div>
     <div class="comparison">
-      <div class="container"><canvas id="canvasleft" height="600" width="600"></canvas></div>
-      <div class="container"><canvas id="canvasright" height="600" width="600"></canvas></div>
+      <div class="container">
+        <img class="diamond" src="animat-diamond-color.gif" width="100" height="100" />
+        <canvas id="canvasleft" height="600" width="600"></canvas>
+      </div>
+      <div class="container">
+          <img class="diamond" src="animat-diamond-color.gif" width="100" height="100" />
+        <canvas id="canvasright" height="600" width="600"></canvas>
+      </div>
     </div>
     
     <div style="display:none;">
@@ -45,8 +75,12 @@
     const ctx = canvasLeft.getContext('2d');
     const offscreen = canvasRight.transferControlToOffscreen();
     const diamondImage = document.getElementById('source');
-    const counter = document.getElementById('counter');
-    const button = document.getElementById('button');
+    const counter1 = document.getElementById('counter1');
+    const counter2 = document.getElementById('counter2');
+    const counter3 = document.getElementById('counter3');
+    const button1 = document.getElementById('button1');
+    const button2 = document.getElementById('button2');
+    const button3 = document.getElementById('button3');
     const diamonds = [];
 
     const worker = new Worker("worker.js"); 
@@ -66,16 +100,28 @@
       { x: 0, y: -4 },
     ];
 
-    button.addEventListener('click', (e) => {
-      for(let i = 0; i < 5000 ; i++){
-        counter.innerHTML = parseInt(counter.textContent, 10) + 1;
+    button1.addEventListener('click', (e) => {
+      for(let i = 0; i < 1000 ; i++){
+        counter1.innerHTML = parseInt(counter1.textContent, 10) + 1;
+      }
+    })
+
+    button2.addEventListener('click', (e) => {
+      for(let i = 0; i < 30000 ; i++){
+        counter2.innerHTML = parseInt(counter2.textContent, 10) + 1;
+      }
+    })
+
+    button3.addEventListener('click', (e) => {
+      for(let i = 0; i < 100000 ; i++){
+        counter3.innerHTML = parseInt(counter3.textContent, 10) + 1;
       }
     })
 
     const animation = () => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       diamonds.forEach(d => {
-        ctx.drawImage(diamondImage, d.x, d.y);
+        ctx.drawImage(diamondImage, d.x, d.y, 30, 30);
 
         const pick = paths[~~((Math.random() * 10) % 12)];
 
