@@ -29,7 +29,7 @@ const animation = () => {
 
     if (d.y < 0) {
       d.x = 500;
-      d.y = 500;
+      d.y = 350;
     }
   });
 
@@ -38,7 +38,7 @@ const animation = () => {
 
 const createDiamond = n => {
   for (let i = 0; i < n; i++) {
-    diamonds.push({ x: 500, y: 500 });
+    diamonds.push({ x: 500, y: 350 });
   }
 };
 

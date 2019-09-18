@@ -11,12 +11,14 @@
       .container{
         position: relative;
         border: 1px solid;
+        background-image: url('bill.jpg');
+        z-index: -2;
       }
       .busy {
         display: flex;
         justify-content: center;
         font-size: 30px;
-        padding: 15px;
+        padding: 50px;
         text-align: center;
       }
 
@@ -43,25 +45,25 @@
     <div class="busy">
       <div >
         <div id="counter1">0</div>
-        <button id="button1">Make Busy</button>
+        <button id="button1">Get Busy</button>
       </div>
       <div >
         <div id="counter2">0</div>
-        <button id="button2">Make Busy</button>
+        <button id="button2">Get Busy</button>
       </div>
       <div >
         <div id="counter3">0</div>
-        <button id="button3">Make Busy</button>
+        <button id="button3">Get Busy</button>
       </div>
     </div>
     <div class="comparison">
       <div class="container">
         <img class="diamond" src="animat-diamond-color.gif" width="100" height="100" />
-        <canvas id="canvasleft" height="600" width="600"></canvas>
+        <canvas id="canvasleft" height="450" width="600"></canvas>
       </div>
       <div class="container">
           <img class="diamond" src="animat-diamond-color.gif" width="100" height="100" />
-        <canvas id="canvasright" height="600" width="600"></canvas>
+        <canvas id="canvasright" height="450" width="600"></canvas>
       </div>
     </div>
     
@@ -130,7 +132,7 @@
 
         if (d.y < 0) {
           d.x = 500;
-          d.y = 500;
+          d.y = 350;
         }
       });
 
@@ -139,7 +141,7 @@
 
     const createDiamond = n => {
       for (let i = 0; i < n; i++) {
-        diamonds.push({ x: 500, y: 500 });
+        diamonds.push({ x: 500, y: 350 });
       }
     };
 
