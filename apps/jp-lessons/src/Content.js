@@ -5,15 +5,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 function Content() {
   const [numPages, setNumPages] = useState(null);
-  let location = useLocation();
-
+  const location = useLocation();
+  const fileName = location.pathname.split('/').pop();
+  console.log(`${process.env.PUBLIC_URL}/${fileName}.pdf`);
   return (
     <div>
       <Document
-        file={`${process.env.PUBLIC_URL}${location.pathname.replace(
-          '/',
-          ''
-        )}.pdf`}
+        file={`${process.env.PUBLIC_URL}/${fileName}.pdf`}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
       >
         {Array.apply(null, Array(numPages))

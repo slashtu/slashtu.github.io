@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Content from './Content';
 import './App.css';
 
+const URL = '/apps/jp-lessons/';
+
 function Home() {
   return (
     <div>
@@ -18,22 +20,22 @@ function App() {
         <div className="nav">
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to={URL}>Home</Link>
             </li>
             <li>
-              <Link to="/lesson1">Lesson 1 自己紹介</Link>
+              <Link to={`${URL}lesson1`}>Lesson 1 自己紹介</Link>
             </li>
             <li>
-              <Link to="/lesson2">Lesson 2 </Link>
+              <Link to={`${URL}lesson2`}>Lesson 2 </Link>
             </li>
           </ul>
         </div>
         <div className="content">
           <Switch>
-            <Route exact path="/">
+            <Route exact path={URL}>
               <Home />
             </Route>
-            <Route path="/:lesson">
+            <Route path={`${URL}:lessons`}>
               <Content />
             </Route>
           </Switch>
