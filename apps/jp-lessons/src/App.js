@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect,
+} from 'react-router-dom';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -52,7 +58,7 @@ function App() {
         <div className="content">
           <Switch>
             <Route exact path={URL}>
-              <Home />
+              <Redirect to={`${URL}lesson1`} />
             </Route>
             <Route path={`${URL}:lessons`}>
               <Content />
