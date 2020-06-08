@@ -1,3 +1,19 @@
+a {
+  text-decoration: inherit;
+  color: inherit;
+  cursor: auto;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+a:visited {
+  text-decoration: inherit;
+  color: inherit;
+  cursor: auto;
+}
+
 .App {
   text-align: center;
 }
@@ -44,4 +60,15 @@
 .pdf-page {
   border: solid 1px;
   margin: 20px;
+}
+
+.nav {
+  min-width: 250px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.content {
+  margin-left: 300px;
 }
