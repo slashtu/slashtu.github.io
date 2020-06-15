@@ -14,14 +14,6 @@ import './App.css';
 
 const URL = '/apps/jp-lessons/';
 
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
-}
-
 function App() {
   return (
     <Router>
@@ -47,6 +39,7 @@ function App() {
               'ない形を使った表現',
               'ない形を使った表現②',
               '普通形を使った表現1',
+              '普通形を使った表現2',
             ].map((text, i) => (
               <Link to={`${URL}lesson${i + 1}`}>
                 <ListItem button key={i}>
