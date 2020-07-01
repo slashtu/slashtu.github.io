@@ -44,6 +44,7 @@ function App() {
               '普通形を使った表現4',
               '普通形を使った表現5',
               '可能形',
+              '可能形2',
             ].map((text, i) => (
               <Link to={`${URL}lesson${i + 1}`}>
                 <ListItem button key={i}>
