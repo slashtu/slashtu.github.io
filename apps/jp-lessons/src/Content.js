@@ -7,7 +7,7 @@ function Content() {
   const [numPages, setNumPages] = useState(null);
   const location = useLocation();
   const fileName = location.pathname.split('/').pop();
-  console.log(`${process.env.PUBLIC_URL}/${fileName}.pdf`);
+
   return (
     <div>
       <Document
