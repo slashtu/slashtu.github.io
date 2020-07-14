@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/apps/jp-lessons/static/css/main.77b8d12e.chunk.css",
-    "main.js": "/apps/jp-lessons/static/js/main.f4a46553.chunk.js",
-    "main.js.map": "/apps/jp-lessons/static/js/main.f4a46553.chunk.js.map",
+    "main.js": "/apps/jp-lessons/static/js/main.a6f817cf.chunk.js",
+    "main.js.map": "/apps/jp-lessons/static/js/main.a6f817cf.chunk.js.map",
     "runtime-main.js": "/apps/jp-lessons/static/js/runtime-main.7a8e9c81.js",
     "runtime-main.js.map": "/apps/jp-lessons/static/js/runtime-main.7a8e9c81.js.map",
     "static/js/2.04f0cc4a.chunk.js": "/apps/jp-lessons/static/js/2.04f0cc4a.chunk.js",
     "static/js/2.04f0cc4a.chunk.js.map": "/apps/jp-lessons/static/js/2.04f0cc4a.chunk.js.map",
     "index.html": "/apps/jp-lessons/index.html",
-    "precache-manifest.4a328bec674b17b1dbd54340cc5a558f.js": "/apps/jp-lessons/precache-manifest.4a328bec674b17b1dbd54340cc5a558f.js",
+    "precache-manifest.d00fd9bcb9a1204144b2d2b6a1141e6e.js": "/apps/jp-lessons/precache-manifest.d00fd9bcb9a1204144b2d2b6a1141e6e.js",
     "service-worker.js": "/apps/jp-lessons/service-worker.js",
     "static/css/main.77b8d12e.chunk.css.map": "/apps/jp-lessons/static/css/main.77b8d12e.chunk.css.map",
     "static/js/2.04f0cc4a.chunk.js.LICENSE.txt": "/apps/jp-lessons/static/js/2.04f0cc4a.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.7a8e9c81.js",
     "static/js/2.04f0cc4a.chunk.js",
     "static/css/main.77b8d12e.chunk.css",
-    "static/js/main.f4a46553.chunk.js"
+    "static/js/main.a6f817cf.chunk.js"
   ]
 }
