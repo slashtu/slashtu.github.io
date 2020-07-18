@@ -49,6 +49,7 @@ function App() {
               '授受表現1',
               '授受表現2',
               '意向形1',
+              '意向形2',
             ].map((text, i) => (
               <Link to={`${URL}lesson${i + 1}`}>
                 <ListItem button key={i}>
