@@ -5,6 +5,7 @@ import {
   Route,
   Link,
   Redirect,
+  HashRouter,
 } from 'react-router-dom';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,7 +17,7 @@ const URL = '/apps/jp-lessons/';
 
 function App() {
   return (
-    <Router>
+    <HashRouter>
       <div className="page">
         <div className="nav">
           <List>
@@ -50,8 +51,9 @@ function App() {
               '授受表現2',
               '意向形1',
               '意向形2',
+              '命令形&禁止形1',
             ].map((text, i) => (
-              <Link to={`${URL}lesson${i + 1}`}>
+              <Link to={`lesson${i + 1}`}>
                 <ListItem button key={i}>
                   <ListItemText primary={`Lesson ${i + 1} ${text}`} />
                 </ListItem>
@@ -62,15 +64,15 @@ function App() {
         <div className="content">
           <Switch>
             <Route exact path={URL}>
-              <Redirect to={`${URL}lesson1`} />
+              <Redirect to={`lesson1`} />
             </Route>
-            <Route path={`${URL}:lessons`}>
+            <Route path={`/:lessons`}>
               <Content />
             </Route>
           </Switch>
         </div>
       </div>
-    </Router>
+    </HashRouter>
   );
 }
 
