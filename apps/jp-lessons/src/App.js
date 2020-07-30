@@ -52,6 +52,7 @@ function App() {
               '意向形1',
               '意向形2',
               '命令形&禁止形1',
+              '命令形&禁止形2',
             ].map((text, i) => (
               <Link to={`lesson${i + 1}`}>
                 <ListItem button key={i}>
