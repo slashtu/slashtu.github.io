@@ -58,6 +58,7 @@ function App() {
               '使役形1',
               '使役形2',
               '理由・原因の表現',
+              '目的の表現',
             ].map((text, i) => (
               <Link to={`lesson${i + 1}`}>
                 <ListItem button key={i}>
