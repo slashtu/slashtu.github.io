@@ -63,6 +63,7 @@ function App() {
               '不満・意外の表現',
               '動作の段階',
               'とき',
+              '~ています(状態)',
             ].map((text, i) => (
               <Link to={`lesson${i + 1}`}>
                 <ListItem button key={i}>

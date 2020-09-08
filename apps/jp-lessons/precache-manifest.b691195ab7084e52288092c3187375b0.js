@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a0077b66f0fb89cb6aaab5ef12efce95",
+    "revision": "a24c88a703d2624c4762c6e5e692d47f",
     "url": "/apps/jp-lessons/index.html"
   },
   {
-    "revision": "69f53764167c429bc2f8",
+    "revision": "b77ea904088234534341",
     "url": "/apps/jp-lessons/static/css/main.77b8d12e.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/apps/jp-lessons/static/js/2.24b6284f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "69f53764167c429bc2f8",
-    "url": "/apps/jp-lessons/static/js/main.b371879f.chunk.js"
+    "revision": "b77ea904088234534341",
+    "url": "/apps/jp-lessons/static/js/main.2d299aca.chunk.js"
   },
   {
     "revision": "4895e198d994ecaffb68",
