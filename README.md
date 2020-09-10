@@ -19,7 +19,7 @@ RWD with Sass
 ## [3D Earth](https://slashtu.github.io/apps/3d-earth/)
 3D earth by three.js
 
-## [Japanese Lessons](http://slashtu.github.io/apps/jp-lessons/)
+## [Japanese Lessons](http://slashtu.github.io/apps/jp-lessons/#/lesson1)
 Lesson Documents
 
 ## [My Life](http://slashtu.github.io/apps/wedding-gallery/)
