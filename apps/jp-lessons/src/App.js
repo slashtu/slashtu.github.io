@@ -66,6 +66,7 @@ function App() {
               '~ています(状態)',
               '復習',
               '尊敬語',
+              '尊敬語2',
             ].map((text, i) => (
               <Link to={`lesson${i + 1}`}>
                 <ListItem button key={i}>
