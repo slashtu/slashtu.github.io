@@ -6,32 +6,20 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>iOS Safe Video Merger</title>
+    <title>iOS Video Merger (WebCodecs)</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- FFmpeg.wasm v0.12.x dependencies (UMD) -->
-    <!-- Using specific versions to ensure stability on mobile -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+    <!-- MP4Box.js for Demuxing (Extracting frames from MP4) -->
+    <script src="https://unpkg.com/mp4box@0.5.2/dist/mp4box.all.min.js"></script>
+
+    <!-- mp4-muxer for Muxing (Packaging encoded frames back to MP4) -->
+    <script src="https://unpkg.com/mp4-muxer@5.0.2/build/mp4-muxer.js"></script>
 
     <style>
       body {
         -webkit-tap-highlight-color: transparent;
-        background-color: #f3f4f6;
-      }
-
-      /* Terminal scrollbar styling */
-      .terminal-scroll::-webkit-scrollbar {
-        width: 6px;
-      }
-      .terminal-scroll::-webkit-scrollbar-track {
-        background: #111827;
-      }
-      .terminal-scroll::-webkit-scrollbar-thumb {
-        background-color: #4b5563;
-        border-radius: 10px;
+        background-color: #f9fafb;
       }
     </style>
   </head>
@@ -40,361 +28,454 @@
       <div
         class="max-w-md mx-auto w-full px-4 py-3 flex justify-between items-center"
       >
-        <h1 class="text-lg font-bold text-gray-900">iOS Video Merger</h1>
+        <h1 class="text-xl font-bold text-gray-900 tracking-tight">
+          Merge<span class="text-indigo-600">Pro</span>
+        </h1>
         <span
-          class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded"
-          >v0.12 (ST)</span
+          class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full"
+          >WebCodecs</span
         >
       </div>
     </header>
 
-    <main class="max-w-md mx-auto w-full px-4 mt-4 space-y-4">
-      <!-- Memory Warning specifically for iOS -->
-      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded-r-md">
+    <main class="max-w-md mx-auto w-full px-4 mt-6 space-y-5">
+      <!-- WebCodecs Support Warning -->
+      <div
+        id="supportWarning"
+        class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm"
+      >
         <div class="flex">
           <div class="flex-shrink-0">
             <svg
-              class="h-5 w-5 text-yellow-400"
+              class="h-5 w-5 text-red-500"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
               <path
                 fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                 clip-rule="evenodd"
               />
             </svg>
           </div>
           <div class="ml-3">
-            <p class="text-xs text-yellow-700">
-              <strong>Note for iOS Safari:</strong> Apple strictly limits web
-              memory. If the process silently stops or fails, try smaller or
-              shorter videos.
+            <p class="text-sm text-red-700 font-medium">
+              Your browser does not support WebCodecs.
+            </p>
+            <p class="text-xs text-red-600 mt-1">
+              Please use iOS Safari 16.4+ or a modern Chromium browser.
             </p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h2 class="text-base font-semibold mb-2">1. Select Videos</h2>
-        <p class="text-xs text-gray-500 mb-4">
-          Select multiple videos (must have same resolution/codec for lossless
-          merge).
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <h2 class="text-lg font-semibold mb-1 text-gray-900">Select Videos</h2>
+        <p class="text-sm text-gray-500 mb-5">
+          Choose clips to merge into a single seamless video.
         </p>
 
         <input
           type="file"
           id="videoInput"
           multiple
-          accept="video/*"
+          accept="video/mp4,video/quicktime"
           class="hidden"
         />
+
         <button
           id="selectBtn"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+          class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-2 border-indigo-200 border-dashed font-semibold py-4 px-4 rounded-xl transition-colors flex flex-col justify-center items-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-indigo-500"
             fill="none"
             viewBox="0 0 24 24"
-            stroke-width="2"
             stroke="currentColor"
-            class="w-5 h-5"
+            stroke-width="2"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
+              d="M12 4v16m8-8H4"
             />
           </svg>
-          Choose Videos
+          <span>Tap to Select Videos</span>
         </button>
 
-        <ul id="fileList" class="mt-3 space-y-2 empty:hidden"></ul>
+        <ul id="fileList" class="mt-4 space-y-2 empty:hidden"></ul>
       </div>
 
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-        <h2 class="text-base font-semibold mb-3">2. Process</h2>
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <button
           id="mergeBtn"
           disabled
-          class="w-full bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+          class="w-full bg-gray-900 hover:bg-black disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-semibold py-4 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-lg"
         >
-          Merge Losslessly
+          Start Merging
         </button>
 
-        <!-- Terminal Output UI for debugging iOS crashes -->
-        <div
-          class="mt-4 bg-gray-900 rounded-lg overflow-hidden border border-gray-800"
-        >
+        <!-- Progress Container -->
+        <div id="progressContainer" class="hidden mt-6">
           <div
-            class="bg-gray-800 px-3 py-1.5 flex items-center justify-between"
+            class="flex justify-between text-sm font-medium text-gray-700 mb-2"
           >
-            <span
-              class="text-[10px] text-gray-400 font-mono uppercase tracking-wider"
-              >Console / Logs</span
-            >
-            <button
-              id="clearLogBtn"
-              class="text-[10px] text-gray-400 hover:text-white"
-            >
-              Clear
-            </button>
+            <span id="statusText">Initializing...</span>
+            <span id="percentageText">0%</span>
           </div>
-          <div
-            id="terminal"
-            class="terminal-scroll p-3 h-48 overflow-y-auto font-mono text-[10px] text-green-400 leading-relaxed break-all"
+          <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div
+              id="progressBar"
+              class="bg-indigo-600 h-3 rounded-full transition-all duration-300 ease-out"
+              style="width: 0%"
+            ></div>
+          </div>
+          <p
+            id="subStatusText"
+            class="text-xs text-gray-400 mt-2 text-center font-mono"
           >
-            System ready. Waiting for files...
-          </div>
+            Preparing environment
+          </p>
         </div>
       </div>
 
       <div
         id="resultSection"
-        class="hidden bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex-col items-center gap-4"
+        class="hidden bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex-col items-center gap-5"
       >
-        <h2 class="text-base font-semibold text-green-600 w-full text-left">
-          3. Result
-        </h2>
+        <div class="w-full flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-green-600">Merge Complete!</h2>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+
         <video
           id="outputVideo"
           controls
           playsinline
-          class="w-full rounded-lg bg-black aspect-video object-contain"
+          class="w-full rounded-xl bg-black aspect-video object-contain shadow-inner"
         ></video>
+
         <a
           id="downloadBtn"
-          class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2 text-center"
+          class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-center shadow-md"
         >
-          Download Merged Video
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          Save Video to Photos
         </a>
       </div>
     </main>
 
     <script>
+      // Check for WebCodecs API support
+      if (!('VideoEncoder' in window) || !('VideoDecoder' in window)) {
+        document.getElementById('supportWarning').classList.remove('hidden');
+      }
+
       const videoInput = document.getElementById('videoInput');
       const selectBtn = document.getElementById('selectBtn');
       const fileList = document.getElementById('fileList');
       const mergeBtn = document.getElementById('mergeBtn');
-      const terminal = document.getElementById('terminal');
-      const clearLogBtn = document.getElementById('clearLogBtn');
+
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const statusText = document.getElementById('statusText');
+      const percentageText = document.getElementById('percentageText');
+      const subStatusText = document.getElementById('subStatusText');
+
       const resultSection = document.getElementById('resultSection');
       const outputVideo = document.getElementById('outputVideo');
       const downloadBtn = document.getElementById('downloadBtn');
 
-      let files = [];
-      let ffmpeg = null;
+      let selectedFiles = [];
 
-      // --- Terminal Helper ---
-      function logToTerminal(message, type = 'info') {
-        const line = document.createElement('div');
-        line.className = 'mb-1';
-
-        const timestamp = new Date().toLocaleTimeString('en-US', {
-          hour12: false,
-          fractionalSecondDigits: 1,
-        });
-
-        if (type === 'error') {
-          line.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> <span class="text-red-400">[ERROR] ${message}</span>`;
-        } else if (type === 'warn') {
-          line.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> <span class="text-yellow-400">[WARN] ${message}</span>`;
-        } else {
-          line.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> <span>${message}</span>`;
-        }
-
-        terminal.appendChild(line);
-        terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
-      }
-
-      clearLogBtn.addEventListener('click', () => {
-        terminal.innerHTML = 'Logs cleared.<br/>';
-      });
-
-      // --- File Selection ---
+      // Handle file selection
       selectBtn.addEventListener('click', () => videoInput.click());
 
       videoInput.addEventListener('change', (e) => {
-        files = Array.from(e.target.files);
+        selectedFiles = Array.from(e.target.files);
         fileList.innerHTML = '';
+        resultSection.classList.add('hidden');
 
-        if (files.length === 0) {
+        if (selectedFiles.length === 0) {
           mergeBtn.disabled = true;
           return;
         }
 
-        files.forEach((file, index) => {
+        selectedFiles.forEach((file, index) => {
           const li = document.createElement('li');
           li.className =
-            'text-xs text-gray-700 bg-gray-50 p-2 rounded border border-gray-200 flex justify-between';
-          li.innerHTML = `<span class="truncate pr-2">${index + 1}. ${
-            file.name
-          }</span> <span class="text-gray-400 whitespace-nowrap">${(
-            file.size /
-            (1024 * 1024)
-          ).toFixed(1)} MB</span>`;
+            'text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-center shadow-sm';
+          li.innerHTML = `
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <span class="bg-indigo-100 text-indigo-700 font-bold w-6 h-6 flex items-center justify-center rounded-full text-xs shrink-0">${
+                          index + 1
+                        }</span>
+                        <span class="truncate font-medium">${file.name}</span>
+                    </div>
+                    <span class="text-gray-400 text-xs shrink-0 whitespace-nowrap ml-2">${(
+                      file.size /
+                      (1024 * 1024)
+                    ).toFixed(1)} MB</span>
+                `;
           fileList.appendChild(li);
         });
 
-        mergeBtn.disabled = files.length < 2;
-        if (files.length < 2) {
-          logToTerminal('Please select at least 2 videos to merge.', 'warn');
-        } else {
-          logToTerminal(`${files.length} files selected. Ready to merge.`);
-        }
-
-        // Reset result section
-        resultSection.classList.add('hidden');
-        outputVideo.src = '';
+        mergeBtn.disabled = selectedFiles.length < 2;
       });
 
-      // --- FFmpeg Initialization (Single-Threaded for iOS Safari compatibility) ---
-      async function loadFFmpeg() {
-        if (ffmpeg) return true;
+      /**
+       * Extracts video track info, chunks (samples), and the codec description from an MP4 file.
+       */
+      async function extractVideoData(file) {
+        return new Promise((resolve, reject) => {
+          const mp4box = MP4Box.createFile();
+          let videoTrack = null;
+          let samples = [];
+          let description = null;
 
-        logToTerminal('Initializing FFmpeg.wasm (Single-Threaded)...');
+          mp4box.onError = (e) => reject(`MP4Box Error: ${e}`);
 
-        try {
-          const { FFmpeg } = window.FFmpegWASM;
-          ffmpeg = new FFmpeg();
+          mp4box.onReady = (info) => {
+            videoTrack = info.videoTracks[0];
+            if (!videoTrack)
+              return reject('No video track found in file: ' + file.name);
 
-          // Pipe FFmpeg native logs to our terminal
-          ffmpeg.on('log', ({ message }) => {
-            logToTerminal(message);
-          });
+            // Extract AVCDecoderConfigurationRecord (extradata) required by WebCodecs for H.264
+            try {
+              const trak = mp4box.moov.traks.find(
+                (t) => t.tkhd.track_id === videoTrack.id
+              );
+              if (trak && trak.mdia.minf.stbl.stsd.entries[0].avcC) {
+                const avcC = trak.mdia.minf.stbl.stsd.entries[0].avcC;
+                const stream = new MP4Box.DataStream();
+                stream.endianness = MP4Box.DataStream.BIG_ENDIAN;
+                avcC.write(stream);
+                description = stream.buffer.slice(0, stream.position);
+              }
+            } catch (err) {
+              console.warn(
+                'Could not extract AVCC box (description). Decoder might fail.',
+                err
+              );
+            }
 
-          // Progress event
-          ffmpeg.on('progress', ({ progress, time }) => {
-            logToTerminal(`Processing... ${(progress * 100).toFixed(1)}%`);
-          });
+            mp4box.setExtractionOptions(videoTrack.id);
+            mp4box.start();
+          };
 
-          // CRITICAL FOR IOS:
-          // We MUST use the single-threaded core because Safari does not support SharedArrayBuffer
-          // on basic web pages without complex cross-origin isolation headers.
-          const coreURL =
-            'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js';
-          const wasmURL =
-            'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm';
+          mp4box.onSamples = (id, user, mp4Samples) => {
+            samples.push(...mp4Samples);
+            if (samples.length >= videoTrack.nb_samples) {
+              resolve({ track: videoTrack, samples, description });
+            }
+          };
 
-          logToTerminal(`Downloading core from: ${coreURL}`);
-
-          await ffmpeg.load({
-            coreURL: coreURL,
-            wasmURL: wasmURL,
-          });
-
-          logToTerminal('FFmpeg loaded successfully!', 'info');
-          return true;
-        } catch (err) {
-          console.error(err);
-          logToTerminal(`Failed to load FFmpeg: ${err.message}`, 'error');
-          return false;
-        }
+          // Read file into ArrayBuffer and feed to MP4Box
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const buffer = e.target.result;
+            buffer.fileStart = 0;
+            mp4box.appendBuffer(buffer);
+            mp4box.flush();
+          };
+          reader.onerror = () => reject('Failed to read file: ' + file.name);
+          reader.readAsArrayBuffer(file);
+        });
       }
 
-      // --- Merging Logic ---
       mergeBtn.addEventListener('click', async () => {
-        if (files.length < 2) return;
+        if (selectedFiles.length < 2) return;
 
-        mergeBtn.disabled = true;
-        mergeBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...
-            `;
-
+        // UI Setup for processing
+        mergeBtn.classList.add('hidden');
+        progressContainer.classList.remove('hidden');
         resultSection.classList.add('hidden');
-        logToTerminal('--- STARTING MERGE PROCESS ---');
+
+        let totalSamplesAcrossAllFiles = 0;
+        let samplesProcessed = 0;
 
         try {
-          const isLoaded = await loadFFmpeg();
-          if (!isLoaded) throw new Error('FFmpeg not loaded.');
-
-          const { fetchFile } = window.FFmpegUtil;
-          let concatListStr = '';
-
-          // 1. Write user files to FFmpeg Virtual File System (VFS)
-          for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            // Create safe dummy names to avoid space/special character issues in concat demuxer
-            const safeFileName = `input_${i}.mp4`;
-
-            logToTerminal(`Reading file to memory: ${file.name}`);
-            const fileData = await fetchFile(file);
-
-            logToTerminal(`Writing ${safeFileName} to VFS...`);
-            await ffmpeg.writeFile(safeFileName, fileData);
-
-            // Add to concat list text
-            concatListStr += `file '${safeFileName}'\n`;
+          // 1. Demux all files first to gather configuration and calculate total workload
+          statusText.innerText = 'Analyzing videos...';
+          const fileDatas = [];
+          for (let i = 0; i < selectedFiles.length; i++) {
+            subStatusText.innerText = `Demuxing ${selectedFiles[i].name}...`;
+            const data = await extractVideoData(selectedFiles[i]);
+            fileDatas.push(data);
+            totalSamplesAcrossAllFiles += data.samples.length;
           }
 
-          // 2. Create list.txt for the concat demuxer
-          logToTerminal('Creating concat instruction file (list.txt)...');
-          await ffmpeg.writeFile('list.txt', concatListStr);
-          logToTerminal(`list.txt content:\n${concatListStr}`);
+          // 2. Setup the Muxer (Output MP4 Builder)
+          statusText.innerText = 'Configuring Encoders...';
+          subStatusText.innerText = 'Preparing muxer';
 
-          // 3. Execute Concat Command (Lossless Copy)
-          // -f concat: format is concat
-          // -safe 0: allow unsafe file paths (needed for virtual FS sometimes)
-          // -c copy: DO NOT re-encode, just stitch streams together (Zero lag, zero quality loss)
-          logToTerminal(
-            'Executing FFmpeg command: -f concat -safe 0 -i list.txt -c copy output.mp4'
-          );
+          // Use dimensions and framerate from the first video
+          const baseTrack = fileDatas[0].track;
+          const outWidth = baseTrack.video.width;
+          const outHeight = baseTrack.video.height;
+          const fps =
+            Math.round(baseTrack.timescale / baseTrack.movie_duration) || 30;
 
-          const execResult = await ffmpeg.exec([
-            '-f',
-            'concat',
-            '-safe',
-            '0',
-            '-i',
-            'list.txt',
-            '-c',
-            'copy',
-            'output.mp4',
-          ]);
+          const muxer = new Mp4Muxer.Muxer({
+            target: new Mp4Muxer.ArrayBufferTarget(),
+            video: {
+              codec: 'avc',
+              width: outWidth,
+              height: outHeight,
+            },
+            fastStart: 'in-memory',
+          });
 
-          if (execResult !== 0) {
-            throw new Error(`FFmpeg exited with code ${execResult}`);
+          // 3. Setup the VideoEncoder
+          const encoder = new VideoEncoder({
+            output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+            error: (e) => {
+              throw new Error(`Encoder Error: ${e.message}`);
+            },
+          });
+
+          encoder.configure({
+            codec: 'avc1.42002A', // H.264 Baseline Profile (widely compatible)
+            width: outWidth,
+            height: outHeight,
+            bitrate: 3_000_000, // 3 Mbps
+            framerate: fps,
+            avc: { format: 'avc' },
+          });
+
+          // 4. Sequential Decode and Re-encode Loop
+          let globalTimeOffset = 0; // Microseconds
+
+          for (let i = 0; i < fileDatas.length; i++) {
+            const { track, samples, description } = fileDatas[i];
+            statusText.innerText = `Processing Video ${i + 1} of ${
+              fileDatas.length
+            }`;
+
+            let maxTimestampInCurrentVideo = 0;
+
+            // Promise to wait until this specific video is fully decoded
+            await new Promise(async (resolveVideo, rejectVideo) => {
+              const decoder = new VideoDecoder({
+                output: (frame) => {
+                  // Adjust timestamp to append sequentially
+                  const adjustedTimestamp = frame.timestamp + globalTimeOffset;
+                  const newFrame = new VideoFrame(frame, {
+                    timestamp: adjustedTimestamp,
+                  });
+
+                  // Track the highest timestamp to update global offset later
+                  maxTimestampInCurrentVideo = Math.max(
+                    maxTimestampInCurrentVideo,
+                    adjustedTimestamp + (frame.duration || 0)
+                  );
+
+                  // Send to encoder
+                  encoder.encode(newFrame);
+
+                  // CRITICAL: Free memory immediately
+                  newFrame.close();
+                  frame.close();
+
+                  // Update Progress UI
+                  samplesProcessed++;
+                  const progress = Math.round(
+                    (samplesProcessed / totalSamplesAcrossAllFiles) * 100
+                  );
+                  progressBar.style.width = `${progress}%`;
+                  percentageText.innerText = `${progress}%`;
+                  subStatusText.innerText = `Encoding frame ${samplesProcessed}/${totalSamplesAcrossAllFiles}`;
+                },
+                error: (e) =>
+                  rejectVideo(`Decoder Error on video ${i + 1}: ${e.message}`),
+              });
+
+              // Configure decoder with data from MP4Box
+              decoder.configure({
+                codec: track.codec, // e.g., 'avc1.4d401f'
+                codedWidth: track.video.width,
+                codedHeight: track.video.height,
+                description: description, // Required for H.264
+              });
+
+              // Feed extracted chunks to the decoder
+              for (const sample of samples) {
+                const chunk = new EncodedVideoChunk({
+                  type: sample.is_sync ? 'key' : 'delta',
+                  timestamp: (sample.cts * 1000000) / sample.timescale,
+                  duration: (sample.duration * 1000000) / sample.timescale,
+                  data: sample.data,
+                });
+                decoder.decode(chunk);
+              }
+
+              // Wait for decoder to process all fed chunks
+              await decoder.flush();
+              decoder.close();
+              resolveVideo();
+            });
+
+            // Update global offset for the next video clip
+            globalTimeOffset = maxTimestampInCurrentVideo;
           }
 
-          logToTerminal('Merge completed in VFS. Retrieving output file...');
+          statusText.innerText = 'Finalizing Video...';
+          subStatusText.innerText = 'Packaging MP4 file';
 
-          // 4. Read output file and display
-          const outData = await ffmpeg.readFile('output.mp4');
-          const outBlob = new Blob([outData.buffer], { type: 'video/mp4' });
-          const outUrl = URL.createObjectURL(outBlob);
+          await encoder.flush();
+          encoder.close();
+          muxer.finalize();
 
-          logToTerminal('Output URL generated successfully!', 'info');
+          const buffer = muxer.target.buffer;
+          const blob = new Blob([buffer], { type: 'video/mp4' });
+          const url = URL.createObjectURL(blob);
 
-          // Update UI
-          outputVideo.src = outUrl;
-          downloadBtn.href = outUrl;
-          downloadBtn.download = `Merged_${Date.now()}.mp4`;
+          // Display Result
+          outputVideo.src = url;
+          downloadBtn.href = url;
+          downloadBtn.download = `Merged_Pro_${Date.now()}.mp4`;
+
+          progressContainer.classList.add('hidden');
           resultSection.classList.remove('hidden');
-
-          // Cleanup VFS to free memory on iOS
-          logToTerminal('Cleaning up VFS memory...');
-          await ffmpeg.deleteFile('list.txt');
-          await ffmpeg.deleteFile('output.mp4');
-          for (let i = 0; i < files.length; i++) {
-            await ffmpeg.deleteFile(`input_${i}.mp4`);
-          }
-          logToTerminal('--- PROCESS FINISHED SUCCESSFULLY ---');
+          resultSection.classList.add('flex');
         } catch (error) {
           console.error(error);
-          logToTerminal(error.message, 'error');
-          logToTerminal(
-            "Process failed. If on iOS, your video might be too large for Safari's RAM limits.",
-            'warn'
-          );
+          alert('An error occurred during processing:\n' + error);
+          progressContainer.classList.add('hidden');
+          mergeBtn.classList.remove('hidden');
         } finally {
-          // Reset Button State
+          // Reset UI state for potential subsequent merges
+          mergeBtn.classList.remove('hidden');
           mergeBtn.disabled = false;
-          mergeBtn.innerHTML = 'Merge Losslessly';
+          progressBar.style.width = '0%';
+          percentageText.innerText = '0%';
         }
       });
     </script>
