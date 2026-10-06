@@ -1,638 +1,539 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="h-full bg-slate-950 text-slate-100">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>iPhone 超順暢影音極速合併器</title>
+    <title>Video Merger</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Include mp4-muxer for high performance WebCodecs muxing -->
-    <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@1.3.0/build/mp4-muxer.min.js"></script>
     <style>
       body {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: 'Inter', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        background-color: #f3f4f6;
       }
-      @keyframes pulse-subtle {
-        0%,
+
+      /* Custom scrollbar for file list */
+      .file-list::-webkit-scrollbar {
+        width: 4px;
+      }
+      .file-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .file-list::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+      }
+
+      /* iOS style toggle animation */
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
         100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
         }
       }
-      .animate-pulse-subtle {
-        animation: pulse-subtle 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      .processing-pulse {
+        animation: pulse-ring 2s infinite;
       }
     </style>
   </head>
-  <body
-    class="h-full flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white"
-  >
+  <body class="min-h-screen text-gray-800 antialiased flex flex-col pb-10">
     <header
-      class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 px-4 py-3.5 sm:px-6"
+      class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 safe-area-pt"
     >
-      <div class="max-w-3xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div
-            class="bg-gradient-to-tr from-emerald-500 to-indigo-500 p-2 rounded-xl shadow-lg shadow-indigo-500/20"
-          >
-            <svg
-              class="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2.5"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-          </div>
-          <div>
-            <h1
-              class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent"
-            >
-              iPhone 極速硬體加速合併器
-            </h1>
-            <p class="text-[10px] sm:text-xs text-emerald-400 font-medium">
-              硬體加速 • 影音幀幀流暢 • 絕不掉幀
-            </p>
-          </div>
-        </div>
-        <span
-          class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0"
+      <div
+        class="px-6 py-4 flex justify-between items-center max-w-md mx-auto w-full"
+      >
+        <h1
+          class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
         >
-          WebCodecs GPU
-        </span>
+          MergeVid
+        </h1>
+        <span
+          class="text-xs font-medium bg-blue-100 text-blue-700 py-1 px-2 rounded-full"
+          >iOS Ready</span
+        >
       </div>
     </header>
 
-    <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 space-y-6">
-      <!-- Information Card -->
+    <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6 flex flex-col gap-6">
+      <!-- File Input Area -->
       <div
-        class="bg-slate-900/90 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 shadow-xl space-y-2"
+        class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-4"
       >
         <div
-          class="flex items-center gap-2 text-indigo-300 font-semibold text-sm"
+          class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-2"
         >
           <svg
-            class="w-5 h-5 text-indigo-400"
+            xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            stroke="currentColor"
             viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-8 h-8"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              d="M12 4.5v15m7.5-7.5h-15"
             />
           </svg>
-          <span>已啟用非即時（Non-realtime）GPU 逐影格轉碼技術</span>
         </div>
-        <ul
-          class="text-xs sm:text-sm text-slate-300 space-y-1.5 pl-7 list-disc"
-        >
-          <li>
-            <strong>解決卡頓問題</strong>：採用 WebCodecs
-            硬體編碼器，離線逐影格合成，輸出影片 100% 順暢。
-          </li>
-          <li>
-            <strong>自動黑邊防拉伸</strong
-            >：自動以第一個影片比例為基準，比例不符會補上黑邊，絕不變形。
-          </li>
-          <li>
-            <strong>完整聲音同步</strong>：自動重採樣聲道，合併聲音不
-            lag、不失真。
-          </li>
-        </ul>
-      </div>
-
-      <!-- Upload & Controls Box -->
-      <div
-        class="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-6"
-      >
-        <!-- File Selector Container -->
-        <div>
-          <label class="block text-sm font-semibold text-slate-200 mb-2"
-            >選擇要合併的 iPhone 影片</label
-          >
-          <div class="relative group">
-            <input
-              type="file"
-              id="videoInput"
-              accept="video/*"
-              multiple
-              class="hidden"
-              onchange="handleFileSelect(event)"
-            />
-            <label
-              for="videoInput"
-              class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl cursor-pointer bg-slate-950/60 hover:bg-slate-800/40 transition-all duration-200 p-4 text-center"
-            >
-              <svg
-                class="w-10 h-10 text-indigo-400 group-hover:scale-110 transition-transform mb-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.8"
-                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              <span class="text-sm font-semibold text-slate-200"
-                >點擊選擇兩支（或以上）影片</span
-              >
-              <span class="text-xs text-slate-400 mt-1"
-                >iPhone 請在相簿中直接勾選多個影片檔</span
-              >
-            </label>
-          </div>
+        <div class="text-center">
+          <h2 class="text-lg font-semibold text-gray-900">Select Videos</h2>
+          <p class="text-sm text-gray-500 mt-1">
+            Choose multiple videos to combine.
+          </p>
         </div>
 
-        <!-- Selected Files Preview List -->
-        <div id="fileListContainer" class="hidden space-y-3">
-          <div
-            class="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider"
-          >
-            <span>已選取影片 (<span id="fileCount">0</span>)</span>
-            <button
-              onclick="clearFiles()"
-              class="text-rose-400 hover:text-rose-300 font-medium transition-colors"
-            >
-              清除重新選擇
-            </button>
-          </div>
-          <div id="fileList" class="space-y-2 max-h-52 overflow-y-auto pr-1">
-            <!-- File items injected by JS -->
-          </div>
-        </div>
-
-        <!-- Action Button -->
+        <input
+          type="file"
+          id="fileInput"
+          multiple
+          accept="video/*"
+          class="hidden"
+        />
         <button
-          id="mergeBtn"
-          onclick="startMergingProcess()"
-          disabled
-          class="w-full py-4 px-6 rounded-2xl font-bold text-white text-base bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/25 active:scale-[0.99] transition-all duration-150 flex items-center justify-center gap-2"
+          onclick="document.getElementById('fileInput').click()"
+          class="mt-2 w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-medium transition-colors shadow-sm"
         >
-          <span>開始硬體合成極速影片</span>
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2.5"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
+          Browse Files
         </button>
       </div>
 
-      <!-- Progress Indicator Container -->
       <div
-        id="progressSection"
-        class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4"
+        id="fileListContainer"
+        class="hidden bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
       >
-        <div class="flex items-center justify-between text-sm">
-          <span
-            id="statusText"
-            class="font-semibold text-indigo-300 animate-pulse-subtle"
-            >正在初始化 GPU 硬體解碼器...</span
+        <div class="flex justify-between items-center mb-3 px-2">
+          <h3 class="text-sm font-semibold text-gray-700">
+            Selected Files (<span id="fileCount">0</span>)
+          </h3>
+          <button
+            onclick="clearFiles()"
+            class="text-xs text-red-500 font-medium hover:text-red-600"
           >
-          <span id="progressPercent" class="font-mono font-bold text-slate-300"
-            >0%</span
-          >
+            Clear All
+          </button>
         </div>
-        <div
-          class="w-full bg-slate-950 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-800"
+        <ul
+          id="fileList"
+          class="file-list max-h-48 overflow-y-auto pr-2 space-y-2"
         >
-          <div
-            id="progressBar"
-            class="bg-gradient-to-r from-emerald-400 via-indigo-500 to-violet-500 h-full rounded-full w-0 transition-all duration-150"
-          ></div>
-        </div>
-        <p class="text-xs text-slate-500 text-center">
-          採用 GPU 離線非即時高幀率算圖，請保持分頁開啟
-        </p>
+          <!-- File items injected here via JS -->
+        </ul>
       </div>
 
-      <!-- Output Result Container -->
       <div
-        id="resultSection"
-        class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-5"
+        id="previewContainer"
+        class="hidden flex-col items-center gap-4 w-full"
       >
-        <div class="flex items-center justify-between">
-          <h3
-            class="font-bold text-emerald-400 text-lg flex items-center gap-2"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2.5"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            影片合併成功！
-          </h3>
-          <span
-            id="resultInfo"
-            class="text-xs text-slate-400 font-mono bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800"
-          ></span>
-        </div>
-
-        <!-- Preview Player -->
         <div
-          class="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800 shadow-inner"
+          class="w-full bg-black rounded-2xl overflow-hidden shadow-lg aspect-[9/16] relative border border-gray-200"
         >
-          <video
-            id="resultVideo"
-            controls
-            playsinline
-            class="max-h-[65vh] w-auto h-auto rounded-xl"
-          ></video>
+          <!-- The canvas acts as the preview and the source for recording -->
+          <canvas
+            id="renderCanvas"
+            class="w-full h-full object-contain"
+          ></canvas>
+
+          <!-- Status Overlay -->
+          <div
+            id="statusOverlay"
+            class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white backdrop-blur-sm transition-opacity duration-300"
+          >
+            <div
+              id="loadingSpinner"
+              class="processing-pulse w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"
+            ></div>
+            <p id="statusText" class="font-medium text-lg">Ready to Merge</p>
+            <p
+              id="progressText"
+              class="text-sm text-gray-300 mt-1 opacity-0 transition-opacity"
+            >
+              0 / 0
+            </p>
+          </div>
         </div>
 
-        <!-- Download Action -->
-        <a
-          id="downloadBtn"
-          download="iPhone_Merged_Video.mp4"
-          class="w-full py-4 px-6 rounded-2xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all duration-150 flex items-center justify-center gap-2 text-center text-base"
+        <!-- Merge Button -->
+        <button
+          id="mergeBtn"
+          class="w-full py-4 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+        >
+          Start Merging
+        </button>
+      </div>
+
+      <div
+        id="resultContainer"
+        class="hidden bg-white rounded-2xl p-6 shadow-sm border border-green-100 flex-col items-center text-center gap-4"
+      >
+        <div
+          class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600"
         >
           <svg
-            class="w-5 h-5"
+            xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            stroke="currentColor"
             viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-7 h-7"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              d="M4.5 12.75l6 6 9-13.5"
             />
           </svg>
-          <span>儲存 / 下載無損合併影片</span>
-        </a>
-
-        <!-- iPhone Save to Photos Guide -->
-        <div
-          class="bg-amber-950/30 border border-amber-600/30 rounded-2xl p-4 text-xs text-amber-200/90 leading-relaxed space-y-1.5"
-        >
-          <p class="font-bold text-amber-100 flex items-center gap-1.5 text-sm">
-            <span>📲 iPhone 使用者如何直接存進相簿：</span>
-          </p>
-          <p>1. 點擊上方「儲存 / 下載影片」或長按播放影片視窗。</p>
-          <p>
-            2. 在 Safari 點選左下角「下載項目」點開影片，點選左下角
-            <strong>「分享」圖示 (↑)</strong>。
-          </p>
-          <p>
-            3. 選單選取
-            <strong>「儲存影片」</strong> 即可在手機「照片」相簿中存取！
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900">Merge Complete!</h3>
+          <p class="text-sm text-gray-500 mt-1">
+            Your video is ready to download.
           </p>
         </div>
+        <a
+          id="downloadLink"
+          class="w-full py-3.5 px-4 bg-gray-900 text-white rounded-xl font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+            />
+          </svg>
+          Save Video
+        </a>
+        <button
+          onclick="resetApp()"
+          class="text-sm text-gray-500 font-medium hover:text-gray-800 mt-2"
+        >
+          Create Another
+        </button>
       </div>
     </main>
 
-    <footer class="text-center py-4 text-xs text-slate-600">
-      <p>100% 本地瀏覽器硬體運算 • 零檔案上傳</p>
-    </footer>
-
-    <!-- Offscreen Canvas for precise WebCodecs Frame Extraction -->
-    <canvas id="offscreenCanvas" class="hidden"></canvas>
-
     <script>
-      let selectedFiles = [];
+      const fileInput = document.getElementById('fileInput');
+      const fileListContainer = document.getElementById('fileListContainer');
+      const fileList = document.getElementById('fileList');
+      const fileCountSpan = document.getElementById('fileCount');
+      const previewContainer = document.getElementById('previewContainer');
+      const mergeBtn = document.getElementById('mergeBtn');
+      const renderCanvas = document.getElementById('renderCanvas');
+      const ctx = renderCanvas.getContext('2d', { alpha: false });
+      const statusOverlay = document.getElementById('statusOverlay');
+      const statusText = document.getElementById('statusText');
+      const progressText = document.getElementById('progressText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const resultContainer = document.getElementById('resultContainer');
+      const downloadLink = document.getElementById('downloadLink');
 
-      function handleFileSelect(event) {
-        const files = Array.from(event.target.files);
-        if (!files.length) return;
-        selectedFiles = files;
-        updateUI();
+      let selectedFiles = [];
+      let isProcessing = false;
+      let cancelAnimationId = null;
+
+      // Hidden video element for decoding
+      let sourceVideo = document.createElement('video');
+      sourceVideo.playsInline = true;
+      sourceVideo.crossOrigin = 'anonymous';
+      sourceVideo.style.display = 'none';
+      document.body.appendChild(sourceVideo);
+
+      // Audio Context setup
+      let audioCtx;
+      let audioDest;
+      let mediaSourceNode;
+
+      // Media Recorder setup
+      let mediaRecorder;
+      let recordedChunks = [];
+
+      // Resolution for iPhone (Portrait HD)
+      const CANVAS_WIDTH = 720;
+      const CANVAS_HEIGHT = 1280;
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          selectedFiles = Array.from(e.target.files);
+          updateFileListUI();
+          previewContainer.classList.remove('hidden');
+          resultContainer.classList.add('hidden');
+
+          // Initialize canvas dimensions
+          renderCanvas.width = CANVAS_WIDTH;
+          renderCanvas.height = CANVAS_HEIGHT;
+
+          // Draw initial black background
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+      });
+
+      function updateFileListUI() {
+        fileListContainer.classList.remove('hidden');
+        fileCountSpan.textContent = selectedFiles.length;
+        fileList.innerHTML = '';
+
+        selectedFiles.forEach((file, index) => {
+          const li = document.createElement('li');
+          li.className =
+            'bg-gray-50 rounded-lg p-3 text-sm text-gray-700 flex items-center justify-between border border-gray-100';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'truncate pr-2 w-[80%]';
+          nameSpan.textContent = `${index + 1}. ${file.name}`;
+
+          const sizeSpan = document.createElement('span');
+          sizeSpan.className = 'text-xs text-gray-400 whitespace-nowrap';
+          sizeSpan.textContent = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+
+          li.appendChild(nameSpan);
+          li.appendChild(sizeSpan);
+          fileList.appendChild(li);
+        });
       }
 
       function clearFiles() {
+        if (isProcessing) return;
         selectedFiles = [];
-        document.getElementById('videoInput').value = '';
-        updateUI();
-        document.getElementById('resultSection').classList.add('hidden');
+        fileInput.value = '';
+        fileListContainer.classList.add('hidden');
+        previewContainer.classList.add('hidden');
+        resultContainer.classList.add('hidden');
       }
 
-      function updateUI() {
-        const fileList = document.getElementById('fileList');
-        const container = document.getElementById('fileListContainer');
-        const countLabel = document.getElementById('fileCount');
-        const mergeBtn = document.getElementById('mergeBtn');
+      function resetApp() {
+        clearFiles();
+        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        statusText.textContent = 'Ready to Merge';
+        progressText.classList.add('opacity-0');
+        loadingSpinner.classList.remove('animate-spin', 'border-blue-500');
+        loadingSpinner.classList.add('hidden');
+        mergeBtn.disabled = false;
+        mergeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        recordedChunks = [];
+      }
 
-        fileList.innerHTML = '';
-        countLabel.innerText = selectedFiles.length;
-
-        if (selectedFiles.length > 0) {
-          container.classList.remove('hidden');
-          selectedFiles.forEach((file, index) => {
-            const item = document.createElement('div');
-            item.className =
-              'flex items-center justify-between p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300';
-            item.innerHTML = `
-            <div class="flex items-center gap-2.5 truncate pr-2">
-              <span class="w-5 h-5 rounded-full bg-slate-800 text-indigo-400 flex items-center justify-center text-[10px] font-bold shrink-0">${
-                index + 1
-              }</span>
-              <span class="truncate font-medium">${file.name}</span>
-            </div>
-            <span class="text-slate-500 font-mono shrink-0">${(
-              file.size /
-              (1024 * 1024)
-            ).toFixed(1)} MB</span>
-          `;
-            fileList.appendChild(item);
-          });
-        } else {
-          container.classList.add('hidden');
+      function getSupportedMimeType() {
+        const types = [
+          'video/mp4',
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+        ];
+        for (let t of types) {
+          if (MediaRecorder.isTypeSupported(t)) {
+            return t;
+          }
         }
-
-        mergeBtn.disabled = selectedFiles.length < 2;
+        return '';
       }
 
-      // Helper: Inspect dimensions and metadata of first video
-      function readVideoMetaData(file) {
-        return new Promise((resolve, reject) => {
-          const video = document.createElement('video');
-          video.preload = 'metadata';
-          video.playsInline = true;
-          video.muted = true;
-          const url = URL.createObjectURL(file);
-          video.src = url;
+      mergeBtn.addEventListener('click', async () => {
+        if (selectedFiles.length === 0 || isProcessing) return;
 
-          video.onloadedmetadata = () => {
-            const info = {
-              width: video.videoWidth || 1280,
-              height: video.videoHeight || 720,
-              duration: video.duration || 0,
-            };
-            URL.revokeObjectURL(url);
-            resolve(info);
-          };
-          video.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error('影片解析失敗'));
-          };
-        });
-      }
-
-      // Main non-realtime encoding handler using MP4Muxer & HTML5 Canvas
-      async function startMergingProcess() {
-        if (selectedFiles.length < 2) return;
-
-        const mergeBtn = document.getElementById('mergeBtn');
-        const progressSection = document.getElementById('progressSection');
-        const resultSection = document.getElementById('resultSection');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-
+        isProcessing = true;
         mergeBtn.disabled = true;
-        progressSection.classList.remove('hidden');
-        resultSection.classList.add('hidden');
+        mergeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        // UI Updates
+        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        loadingSpinner.classList.remove('hidden');
+        loadingSpinner.classList.add('animate-spin', 'border-blue-500');
+        statusText.textContent = 'Initializing...';
+        progressText.classList.remove('opacity-0');
+        progressText.textContent = `0 / ${selectedFiles.length}`;
 
         try {
-          statusText.innerText = '讀取首支影片規格...';
-          progressBar.style.width = '5%';
-          progressPercent.innerText = '5%';
-
-          // 1. Determine Target Resolution from First Video
-          const baseMeta = await readVideoMetaData(selectedFiles[0]);
-
-          // Ensure dimensions are even numbers (requirement for AVC/H.264 encoders)
-          const targetW =
-            baseMeta.width % 2 === 0 ? baseMeta.width : baseMeta.width - 1;
-          const targetH =
-            baseMeta.height % 2 === 0 ? baseMeta.height : baseMeta.height - 1;
-          const fps = 30;
-          const frameDurationUs = Math.round(1000000 / fps); // microseconds per frame
-
-          const canvas =
-            document.getElementById('renderCanvas') ||
-            document.getElementById('offscreenCanvas');
-          canvas.width = targetW;
-          canvas.height = targetH;
-          const ctx = canvas.getContext('2d', { alpha: false });
-
-          // 2. Initialize MP4 Muxer (High performance container builder)
-          const muxer = new Mp4Muxer.Muxer({
-            target: new Mp4Muxer.ArrayBufferTarget(),
-            video: {
-              codec: 'avc', // Standard H.264 for Apple & Windows
-              width: targetW,
-              height: targetH,
-            },
-            audio: {
-              codec: 'aac',
-              numberOfChannels: 2,
-              sampleRate: 44100,
-            },
-            fastStart: 'in-memory',
-          });
-
-          // 3. Setup Hardware Video Encoder (WebCodecs)
-          let videoEncoder;
-          let encodedFrameCount = 0;
-
-          if (typeof VideoEncoder !== 'undefined') {
-            videoEncoder = new VideoEncoder({
-              output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-              error: (e) => console.error('VideoEncoder Error:', e),
-            });
-
-            videoEncoder.configure({
-              codec: 'avc1.42E01E', // Baseline H.264
-              width: targetW,
-              height: targetH,
-              bitrate: 4_000_000, // 4 Mbps
-              framerate: fps,
-            });
+          // Initialize Audio Context explicitly on user gesture (required by iOS)
+          if (!audioCtx) {
+            const AudioContext =
+              window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+          }
+          if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
           }
 
-          // Web Audio Context for audio extraction
-          const audioCtx = new (window.AudioContext ||
-            window.webkitAudioContext)({ sampleRate: 44100 });
-          const destNode = audioCtx.createMediaStreamDestination();
+          audioDest = audioCtx.createMediaStreamDestination();
 
-          let presentationTimestampUs = 0;
-
-          // 4. Process Each Video Offline
-          for (let fileIdx = 0; fileIdx < selectedFiles.length; fileIdx++) {
-            const file = selectedFiles[fileIdx];
-            const pct = Math.round((fileIdx / selectedFiles.length) * 90);
-            statusText.innerText = `正在進行 GPU 硬體轉碼影片 ${
-              fileIdx + 1
-            } / ${selectedFiles.length}...`;
-            progressBar.style.width = `${pct}%`;
-            progressPercent.innerText = `${pct}%`;
-
-            await processVideoFile({
-              file,
-              canvas,
-              ctx,
-              targetW,
-              targetH,
-              fps,
-              frameDurationUs,
-              videoEncoder,
-              muxer,
-              audioCtx,
-              destNode,
-              getTimestamp: () => presentationTimestampUs,
-              addTimestamp: (delta) => {
-                presentationTimestampUs += delta;
-              },
-            });
+          // Setup MediaElementSource only once per video element
+          if (!mediaSourceNode) {
+            mediaSourceNode = audioCtx.createMediaElementSource(sourceVideo);
+            mediaSourceNode.connect(audioDest);
+            // Do NOT connect to audioCtx.destination to prevent double audio playback
+            // The audio is silently captured into the stream
           }
 
-          // 5. Finalize Encoding & Final Muxing
-          statusText.innerText = '正在封裝成流暢 MP4 檔案...';
-          progressBar.style.width = '95%';
-          progressPercent.innerText = '95%';
-
-          if (videoEncoder && videoEncoder.state !== 'closed') {
-            await videoEncoder.flush();
-          }
-
-          muxer.finalize();
-          const { buffer } = muxer.target;
-          const outputBlob = new Blob([buffer], { type: 'video/mp4' });
-          const resultUrl = URL.createObjectURL(outputBlob);
-
-          // Display Final Output Video
-          const resultVideo = document.getElementById('resultVideo');
-          const downloadBtn = document.getElementById('downloadBtn');
-          const resultInfo = document.getElementById('resultInfo');
-
-          resultVideo.src = resultUrl;
-          downloadBtn.href = resultUrl;
-          resultInfo.innerText = `${targetW}x${targetH} • ${(
-            outputBlob.size /
-            (1024 * 1024)
-          ).toFixed(1)} MB`;
-
-          progressBar.style.width = '100%';
-          progressPercent.innerText = '100%';
-
-          setTimeout(() => {
-            progressSection.classList.add('hidden');
-            resultSection.classList.remove('hidden');
-            mergeBtn.disabled = false;
-            audioCtx.close();
-          }, 400);
+          startRecording();
         } catch (err) {
-          console.error('Merge error:', err);
-          alert('合併過程發生錯誤：' + err.message);
-          progressSection.classList.add('hidden');
-          mergeBtn.disabled = false;
+          console.error('Error initializing:', err);
+          alert(
+            'Could not start processing. Ensure your browser supports MediaRecorder.'
+          );
+          resetApp();
+          isProcessing = false;
         }
+      });
+
+      function startRecording() {
+        // Capture canvas video stream at 30 FPS
+        const canvasStream = renderCanvas.captureStream(30);
+
+        // Combine Video and Audio tracks
+        const audioTracks = audioDest.stream.getAudioTracks();
+        const combinedStream = new MediaStream([
+          ...canvasStream.getVideoTracks(),
+          ...audioTracks,
+        ]);
+
+        const mimeType = getSupportedMimeType();
+
+        mediaRecorder = new MediaRecorder(combinedStream, {
+          mimeType: mimeType,
+          videoBitsPerSecond: 5000000, // 5Mbps for decent quality
+        });
+
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        mediaRecorder.onstop = finalizeVideo;
+
+        // Start recording
+        mediaRecorder.start();
+
+        // Hide overlay to show preview
+        statusOverlay.classList.add('opacity-0', 'pointer-events-none');
+
+        // Begin sequence
+        playNextVideo(0);
       }
 
-      // Process each video non-realtime with exact frame stepping
-      function processVideoFile(opts) {
-        return new Promise((resolve, reject) => {
-          const {
-            file,
-            canvas,
-            ctx,
-            targetW,
-            targetH,
-            fps,
-            frameDurationUs,
-            videoEncoder,
-            muxer,
-            audioCtx,
-            destNode,
-          } = opts;
+      function playNextVideo(index) {
+        if (index >= selectedFiles.length) {
+          // All videos finished
+          mediaRecorder.stop();
+          return;
+        }
 
-          const video = document.createElement('video');
-          const url = URL.createObjectURL(file);
-          video.src = url;
-          video.muted = true;
-          video.playsInline = true;
+        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        statusText.textContent = 'Processing...';
+        progressText.textContent = `${index + 1} / ${selectedFiles.length}`;
+        setTimeout(() => {
+          statusOverlay.classList.add('opacity-0', 'pointer-events-none');
+        }, 800);
 
-          video.onloadedmetadata = async () => {
-            const duration = video.duration;
-            const totalFrames = Math.max(1, Math.floor(duration * fps));
+        const currentFile = selectedFiles[index];
+        const fileURL = URL.createObjectURL(currentFile);
 
-            // Calculate scale & letterbox offsets (prevent distortion)
-            const srcW = video.videoWidth;
-            const srcH = video.videoHeight;
-            const scale = Math.min(targetW / srcW, targetH / srcH);
-            const drawW = srcW * scale;
-            const drawH = srcH * scale;
-            const offsetX = (targetW - drawW) / 2;
-            const offsetY = (targetH - drawH) / 2;
+        sourceVideo.src = fileURL;
+        sourceVideo.load();
 
-            for (let frameIdx = 0; frameIdx < totalFrames; frameIdx++) {
-              const targetTime = frameIdx / fps;
-              video.currentTime = targetTime;
+        sourceVideo.onloadedmetadata = () => {
+          sourceVideo
+            .play()
+            .then(() => {
+              drawFrame();
+            })
+            .catch((err) => {
+              console.error('Playback failed', err);
+              // Skip to next if autoplay fails
+              playNextVideo(index + 1);
+            });
+        };
 
-              await new Promise((r) => {
-                const onSeek = () => {
-                  video.removeEventListener('seeked', onSeek);
-                  r();
-                };
-                video.addEventListener('seeked', onSeek);
-              });
+        sourceVideo.onended = () => {
+          cancelAnimationFrame(cancelAnimationId);
+          URL.revokeObjectURL(fileURL); // Clean up memory
+          playNextVideo(index + 1);
+        };
+      }
 
-              // Draw to Canvas with Black Letterboxing
-              ctx.fillStyle = '#000000';
-              ctx.fillRect(0, 0, targetW, targetH);
-              ctx.drawImage(video, offsetX, offsetY, drawW, drawH);
+      function drawFrame() {
+        if (sourceVideo.paused || sourceVideo.ended) return;
 
-              // Encode VideoFrame using Hardware Accelerator or Fallback
-              const currentTimestampUs = opts.getTimestamp();
+        // Calculate aspect ratio to fit (contain/letterbox)
+        const vRatio = CANVAS_WIDTH / sourceVideo.videoWidth;
+        const hRatio = CANVAS_HEIGHT / sourceVideo.videoHeight;
+        const ratio = Math.min(vRatio, hRatio);
 
-              if (videoEncoder && typeof VideoFrame !== 'undefined') {
-                const frame = new VideoFrame(canvas, {
-                  timestamp: currentTimestampUs,
-                });
-                const isKeyFrame = frameIdx % 30 === 0;
-                videoEncoder.encode(frame, { keyFrame: isKeyFrame });
-                frame.close();
-              }
+        const drawWidth = sourceVideo.videoWidth * ratio;
+        const drawHeight = sourceVideo.videoHeight * ratio;
+        const shiftX = (CANVAS_WIDTH - drawWidth) / 2;
+        const shiftY = (CANVAS_HEIGHT - drawHeight) / 2;
 
-              opts.addTimestamp(frameDurationUs);
-            }
+        // Clear frame
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-            URL.revokeObjectURL(url);
-            resolve();
-          };
+        // Draw video frame
+        ctx.drawImage(
+          sourceVideo,
+          0,
+          0,
+          sourceVideo.videoWidth,
+          sourceVideo.videoHeight,
+          shiftX,
+          shiftY,
+          drawWidth,
+          drawHeight
+        );
 
-          video.onerror = (e) => {
-            URL.revokeObjectURL(url);
-            reject(e);
-          };
-        });
+        cancelAnimationId = requestAnimationFrame(drawFrame);
+      }
+
+      function finalizeVideo() {
+        isProcessing = false;
+
+        // Stop all tracks to free up camera/memory
+        if (mediaRecorder && mediaRecorder.stream) {
+          mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        }
+
+        // Create Blob
+        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
+        const finalURL = URL.createObjectURL(blob);
+
+        // Update UI
+        previewContainer.classList.add('hidden');
+        resultContainer.classList.remove('hidden');
+        fileListContainer.classList.add('hidden');
+
+        // Set download link attributes
+        const extension = mediaRecorder.mimeType.includes('mp4')
+          ? 'mp4'
+          : 'webm';
+        downloadLink.href = finalURL;
+        downloadLink.download = `merged_video_${Date.now()}.${extension}`;
       }
     </script>
   </body>
