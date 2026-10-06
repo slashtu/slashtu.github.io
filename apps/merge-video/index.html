@@ -6,77 +6,72 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Video Merger</title>
+    <title>Video Merger (Lossless)</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- FFmpeg.wasm v0.12+ dependencies -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.7/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+
     <style>
       body {
         font-family: 'Inter', sans-serif;
         -webkit-tap-highlight-color: transparent;
-        background-color: #f3f4f6;
+        background-color: #f2f2f7; /* iOS system background color */
       }
 
-      /* Custom scrollbar for file list */
-      .file-list::-webkit-scrollbar {
+      /* Custom scrollbar for logs and file list */
+      .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
       }
-      .file-list::-webkit-scrollbar-track {
+      .custom-scrollbar::-webkit-scrollbar-track {
         background: transparent;
       }
-      .file-list::-webkit-scrollbar-thumb {
+      .custom-scrollbar::-webkit-scrollbar-thumb {
         background-color: #cbd5e1;
         border-radius: 20px;
       }
-
-      /* iOS style toggle animation */
-      @keyframes pulse-ring {
-        0% {
-          transform: scale(0.95);
-          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-        }
-        70% {
-          transform: scale(1);
-          box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-        }
-        100% {
-          transform: scale(0.95);
-          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-        }
+      .log-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #4b5563;
       }
-      .processing-pulse {
-        animation: pulse-ring 2s infinite;
+
+      /* iOS safe area padding for modern iPhones */
+      .safe-area-pt {
+        padding-top: env(safe-area-inset-top);
       }
     </style>
   </head>
-  <body class="min-h-screen text-gray-800 antialiased flex flex-col pb-10">
+  <body class="min-h-screen text-gray-900 antialiased flex flex-col pb-10">
     <header
-      class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 safe-area-pt"
+      class="bg-white/70 backdrop-blur-xl sticky top-0 z-50 border-b border-gray-200 safe-area-pt"
     >
       <div
         class="px-6 py-4 flex justify-between items-center max-w-md mx-auto w-full"
       >
-        <h1
-          class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-        >
-          MergeVid
+        <h1 class="text-xl font-bold tracking-tight">
+          MergeVid <span class="text-blue-500">Pro</span>
         </h1>
         <span
-          class="text-xs font-medium bg-blue-100 text-blue-700 py-1 px-2 rounded-full"
-          >iOS Ready</span
+          class="text-[10px] font-semibold bg-gray-100 text-gray-600 uppercase tracking-wider py-1 px-2.5 rounded-full"
+          >Lossless</span
         >
       </div>
     </header>
 
-    <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6 flex flex-col gap-6">
-      <!-- File Input Area -->
+    <main class="flex-1 w-full max-w-md mx-auto px-4 mt-6 flex flex-col gap-5">
       <div
-        class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-4"
+        class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-3"
       >
         <div
-          class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-2"
+          class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center text-blue-500"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +79,7 @@
             viewBox="0 0 24 24"
             stroke-width="2"
             stroke="currentColor"
-            class="w-8 h-8"
+            class="w-7 h-7"
           >
             <path
               stroke-linecap="round"
@@ -94,9 +89,10 @@
           </svg>
         </div>
         <div class="text-center">
-          <h2 class="text-lg font-semibold text-gray-900">Select Videos</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Choose multiple videos to combine.
+          <h2 class="text-[17px] font-semibold text-gray-900">Select Videos</h2>
+          <p class="text-sm text-gray-500 mt-1 leading-tight">
+            Videos must share the same resolution and codecs for lossless
+            merging.
           </p>
         </div>
 
@@ -109,9 +105,9 @@
         />
         <button
           onclick="document.getElementById('fileInput').click()"
-          class="mt-2 w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-medium transition-colors shadow-sm"
+          class="mt-3 w-full py-3.5 px-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-sm text-[17px]"
         >
-          Browse Files
+          Choose Files
         </button>
       </div>
 
@@ -119,72 +115,87 @@
         id="fileListContainer"
         class="hidden bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
       >
-        <div class="flex justify-between items-center mb-3 px-2">
-          <h3 class="text-sm font-semibold text-gray-700">
-            Selected Files (<span id="fileCount">0</span>)
+        <div class="flex justify-between items-center mb-3 px-1">
+          <h3 class="text-sm font-semibold text-gray-800">
+            Queue (<span id="fileCount">0</span>)
           </h3>
           <button
             onclick="clearFiles()"
-            class="text-xs text-red-500 font-medium hover:text-red-600"
+            class="text-sm text-blue-500 font-medium active:text-blue-700"
           >
-            Clear All
+            Clear
           </button>
         </div>
         <ul
           id="fileList"
-          class="file-list max-h-48 overflow-y-auto pr-2 space-y-2"
+          class="custom-scrollbar max-h-48 overflow-y-auto pr-1 space-y-2"
         >
           <!-- File items injected here via JS -->
         </ul>
+
+        <button
+          id="mergeBtn"
+          class="mt-4 w-full py-3.5 px-4 bg-gray-900 text-white rounded-xl font-medium transition-transform active:scale-[0.98] text-[17px] shadow-sm flex items-center justify-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="w-5 h-5"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Merge Instantly
+        </button>
       </div>
 
-      <div
-        id="previewContainer"
-        class="hidden flex-col items-center gap-4 w-full"
-      >
+      <div id="processingContainer" class="hidden flex-col gap-3 w-full">
         <div
-          class="w-full bg-black rounded-2xl overflow-hidden shadow-lg aspect-[9/16] relative border border-gray-200"
+          class="bg-gray-900 rounded-2xl p-4 shadow-sm overflow-hidden border border-gray-800"
         >
-          <!-- The canvas acts as the preview and the source for recording -->
-          <canvas
-            id="renderCanvas"
-            class="w-full h-full object-contain"
-          ></canvas>
-
-          <!-- Status Overlay -->
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-mono text-gray-400">FFmpeg Terminal</span>
+            <div class="flex gap-1.5">
+              <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            </div>
+          </div>
           <div
-            id="statusOverlay"
-            class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white backdrop-blur-sm transition-opacity duration-300"
+            id="logOutput"
+            class="log-scrollbar h-40 overflow-y-auto font-mono text-[10px] text-green-400 leading-relaxed whitespace-pre-wrap break-words"
           >
-            <div
-              id="loadingSpinner"
-              class="processing-pulse w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"
-            ></div>
-            <p id="statusText" class="font-medium text-lg">Ready to Merge</p>
-            <p
-              id="progressText"
-              class="text-sm text-gray-300 mt-1 opacity-0 transition-opacity"
-            >
-              0 / 0
-            </p>
+            Loading FFmpeg core...
           </div>
         </div>
 
-        <!-- Merge Button -->
-        <button
-          id="mergeBtn"
-          class="w-full py-4 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
-        >
-          Start Merging
-        </button>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div
+            class="flex justify-between text-sm font-medium mb-2 text-gray-700"
+          >
+            <span>Progress</span>
+            <span id="progressText">0%</span>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div
+              id="progressBar"
+              class="bg-blue-500 h-2.5 rounded-full transition-all duration-300"
+              style="width: 0%"
+            ></div>
+          </div>
+        </div>
       </div>
 
       <div
         id="resultContainer"
-        class="hidden bg-white rounded-2xl p-6 shadow-sm border border-green-100 flex-col items-center text-center gap-4"
+        class="hidden bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex-col items-center text-center gap-4"
       >
         <div
-          class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600"
+          class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-1"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +203,7 @@
             viewBox="0 0 24 24"
             stroke-width="2.5"
             stroke="currentColor"
-            class="w-7 h-7"
+            class="w-8 h-8"
           >
             <path
               stroke-linecap="round"
@@ -202,14 +213,22 @@
           </svg>
         </div>
         <div>
-          <h3 class="text-lg font-bold text-gray-900">Merge Complete!</h3>
+          <h3 class="text-xl font-bold text-gray-900">Success!</h3>
           <p class="text-sm text-gray-500 mt-1">
-            Your video is ready to download.
+            Your lossless video is ready.
           </p>
         </div>
+
+        <video
+          id="previewVideo"
+          class="w-full rounded-lg mt-2 bg-black aspect-video object-contain border border-gray-200"
+          controls
+          playsinline
+        ></video>
+
         <a
           id="downloadLink"
-          class="w-full py-3.5 px-4 bg-gray-900 text-white rounded-xl font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+          class="w-full mt-2 py-3.5 px-4 bg-blue-500 text-white rounded-xl font-medium transition-transform active:scale-[0.98] text-[17px] shadow-sm flex items-center justify-center gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -225,13 +244,13 @@
               d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
             />
           </svg>
-          Save Video
+          Save to Photos
         </a>
         <button
           onclick="resetApp()"
-          class="text-sm text-gray-500 font-medium hover:text-gray-800 mt-2"
+          class="text-[15px] text-gray-500 font-medium active:text-gray-800 mt-2 py-2"
         >
-          Create Another
+          Merge More Videos
         </button>
       </div>
     </main>
@@ -241,74 +260,54 @@
       const fileListContainer = document.getElementById('fileListContainer');
       const fileList = document.getElementById('fileList');
       const fileCountSpan = document.getElementById('fileCount');
-      const previewContainer = document.getElementById('previewContainer');
       const mergeBtn = document.getElementById('mergeBtn');
-      const renderCanvas = document.getElementById('renderCanvas');
-      const ctx = renderCanvas.getContext('2d', { alpha: false });
-      const statusOverlay = document.getElementById('statusOverlay');
-      const statusText = document.getElementById('statusText');
+      const processingContainer = document.getElementById(
+        'processingContainer'
+      );
+      const logOutput = document.getElementById('logOutput');
+      const progressBar = document.getElementById('progressBar');
       const progressText = document.getElementById('progressText');
-      const loadingSpinner = document.getElementById('loadingSpinner');
       const resultContainer = document.getElementById('resultContainer');
       const downloadLink = document.getElementById('downloadLink');
+      const previewVideo = document.getElementById('previewVideo');
 
       let selectedFiles = [];
       let isProcessing = false;
-      let cancelAnimationId = null;
+      let ffmpeg = null;
 
-      // Hidden video element for decoding
-      let sourceVideo = document.createElement('video');
-      sourceVideo.playsInline = true;
-      sourceVideo.crossOrigin = 'anonymous';
-      sourceVideo.style.display = 'none';
-      document.body.appendChild(sourceVideo);
-
-      // Audio Context setup
-      let audioCtx;
-      let audioDest;
-      let mediaSourceNode;
-
-      // Media Recorder setup
-      let mediaRecorder;
-      let recordedChunks = [];
-
-      // Resolution for iPhone (Portrait HD)
-      const CANVAS_WIDTH = 720;
-      const CANVAS_HEIGHT = 1280;
+      // Add message to terminal UI
+      function appendLog(message) {
+        const span = document.createElement('div');
+        span.textContent = `> ${message}`;
+        logOutput.appendChild(span);
+        logOutput.scrollTop = logOutput.scrollHeight;
+      }
 
       fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
           selectedFiles = Array.from(e.target.files);
           updateFileListUI();
-          previewContainer.classList.remove('hidden');
+          fileListContainer.classList.remove('hidden');
           resultContainer.classList.add('hidden');
-
-          // Initialize canvas dimensions
-          renderCanvas.width = CANVAS_WIDTH;
-          renderCanvas.height = CANVAS_HEIGHT;
-
-          // Draw initial black background
-          ctx.fillStyle = '#000000';
-          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         }
       });
 
       function updateFileListUI() {
-        fileListContainer.classList.remove('hidden');
         fileCountSpan.textContent = selectedFiles.length;
         fileList.innerHTML = '';
 
         selectedFiles.forEach((file, index) => {
           const li = document.createElement('li');
           li.className =
-            'bg-gray-50 rounded-lg p-3 text-sm text-gray-700 flex items-center justify-between border border-gray-100';
+            'bg-gray-50 rounded-xl p-3 text-sm text-gray-700 flex items-center justify-between border border-gray-100';
 
           const nameSpan = document.createElement('span');
-          nameSpan.className = 'truncate pr-2 w-[80%]';
-          nameSpan.textContent = `${index + 1}. ${file.name}`;
+          nameSpan.className = 'truncate pr-2 font-medium';
+          nameSpan.textContent = file.name;
 
           const sizeSpan = document.createElement('span');
-          sizeSpan.className = 'text-xs text-gray-400 whitespace-nowrap';
+          sizeSpan.className =
+            'text-xs text-gray-400 font-mono whitespace-nowrap';
           sizeSpan.textContent = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
 
           li.appendChild(nameSpan);
@@ -322,219 +321,153 @@
         selectedFiles = [];
         fileInput.value = '';
         fileListContainer.classList.add('hidden');
-        previewContainer.classList.add('hidden');
+        processingContainer.classList.add('hidden');
         resultContainer.classList.add('hidden');
       }
 
       function resetApp() {
         clearFiles();
-        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        statusText.textContent = 'Ready to Merge';
-        progressText.classList.add('opacity-0');
-        loadingSpinner.classList.remove('animate-spin', 'border-blue-500');
-        loadingSpinner.classList.add('hidden');
-        mergeBtn.disabled = false;
-        mergeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        recordedChunks = [];
+        previewVideo.src = '';
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+        logOutput.innerHTML = '';
       }
 
-      function getSupportedMimeType() {
-        const types = [
-          'video/mp4',
-          'video/webm;codecs=vp9,opus',
-          'video/webm;codecs=vp8,opus',
-          'video/webm',
-        ];
-        for (let t of types) {
-          if (MediaRecorder.isTypeSupported(t)) {
-            return t;
-          }
+      async function initFFmpeg() {
+        if (ffmpeg) return true;
+
+        try {
+          const { FFmpeg } = window.FFmpegWASM;
+          ffmpeg = new FFmpeg();
+
+          ffmpeg.on('log', ({ message }) => {
+            console.log(message);
+            appendLog(message);
+          });
+
+          ffmpeg.on('progress', ({ progress, time }) => {
+            // Progress is between 0 and 1
+            const percent = Math.max(
+              0,
+              Math.min(100, Math.round(progress * 100))
+            );
+            progressBar.style.width = `${percent}%`;
+            progressText.textContent = `${percent}%`;
+          });
+
+          appendLog('Downloading FFmpeg core...');
+
+          // Load core and wasm from unpkg
+          await ffmpeg.load({
+            coreURL:
+              'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+            wasmURL:
+              'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm',
+          });
+
+          appendLog('FFmpeg core loaded successfully.');
+          return true;
+        } catch (error) {
+          console.error('FFmpeg Load Error:', error);
+          appendLog(`ERROR: ${error.message}`);
+          return false;
         }
-        return '';
       }
 
       mergeBtn.addEventListener('click', async () => {
-        if (selectedFiles.length === 0 || isProcessing) return;
+        if (selectedFiles.length < 2) {
+          const msg = document.createElement('div');
+          msg.className = 'text-red-500 text-sm mt-2 font-medium text-center';
+          msg.textContent = 'Please select at least 2 videos.';
+          fileListContainer.appendChild(msg);
+          setTimeout(() => msg.remove(), 3000);
+          return;
+        }
+        if (isProcessing) return;
 
         isProcessing = true;
         mergeBtn.disabled = true;
-        mergeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        mergeBtn.classList.add('opacity-50');
 
         // UI Updates
-        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        loadingSpinner.classList.remove('hidden');
-        loadingSpinner.classList.add('animate-spin', 'border-blue-500');
-        statusText.textContent = 'Initializing...';
-        progressText.classList.remove('opacity-0');
-        progressText.textContent = `0 / ${selectedFiles.length}`;
+        fileListContainer.classList.add('hidden');
+        processingContainer.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+        logOutput.innerHTML = '';
 
         try {
-          // Initialize Audio Context explicitly on user gesture (required by iOS)
-          if (!audioCtx) {
-            const AudioContext =
-              window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-          }
-          if (audioCtx.state === 'suspended') {
-            await audioCtx.resume();
+          // Initialize engine
+          const isReady = await initFFmpeg();
+          if (!isReady) throw new Error('Failed to initialize FFmpeg.');
+
+          const { fetchFile } = window.FFmpegUtil;
+          let listFileContent = '';
+
+          appendLog(`Preparing ${selectedFiles.length} files for merging...`);
+
+          // 1. Write files to FFmpeg Virtual File System (VFS)
+          for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            // Sanitize file names to prevent issues in the concat text file
+            const ext = file.name.split('.').pop();
+            const safeName = `input_${i}.${ext}`;
+
+            appendLog(`Writing ${safeName} to VFS...`);
+            const fileData = await fetchFile(file);
+            await ffmpeg.writeFile(safeName, fileData);
+
+            // Append to the list text file format
+            listFileContent += `file '${safeName}'\n`;
           }
 
-          audioDest = audioCtx.createMediaStreamDestination();
+          // 2. Create the mylist.txt configuration file
+          appendLog('Creating concat configuration file...');
+          await ffmpeg.writeFile('mylist.txt', listFileContent);
 
-          // Setup MediaElementSource only once per video element
-          if (!mediaSourceNode) {
-            mediaSourceNode = audioCtx.createMediaElementSource(sourceVideo);
-            mediaSourceNode.connect(audioDest);
-            // Do NOT connect to audioCtx.destination to prevent double audio playback
-            // The audio is silently captured into the stream
-          }
+          // 3. Execute the FFmpeg Concatenation Command
+          appendLog('Starting lossless concatenation (-c copy)...');
+          progressBar.style.width = '10%'; // Give a visual bump
+          progressText.textContent = 'Merging...';
 
-          startRecording();
-        } catch (err) {
-          console.error('Error initializing:', err);
-          alert(
-            'Could not start processing. Ensure your browser supports MediaRecorder.'
-          );
-          resetApp();
+          await ffmpeg.exec([
+            '-f',
+            'concat',
+            '-safe',
+            '0',
+            '-i',
+            'mylist.txt',
+            '-c',
+            'copy',
+            'output.mp4',
+          ]);
+
+          // 4. Retrieve the output file
+          appendLog('Retrieving final output...');
+          const data = await ffmpeg.readFile('output.mp4');
+
+          const blob = new Blob([data.buffer], { type: 'video/mp4' });
+          const url = URL.createObjectURL(blob);
+
+          // Update UI for success
+          processingContainer.classList.add('hidden');
+          resultContainer.classList.remove('hidden');
+
+          // Set preview and download link
+          previewVideo.src = url;
+          downloadLink.href = url;
+          downloadLink.download = `MergedVideo_${Date.now()}.mp4`;
+        } catch (error) {
+          console.error('Merge Error:', error);
+          appendLog(`CRITICAL ERROR: ${error.message}`);
+          progressText.textContent = 'Failed';
+          progressBar.classList.replace('bg-blue-500', 'bg-red-500');
+        } finally {
           isProcessing = false;
+          mergeBtn.disabled = false;
+          mergeBtn.classList.remove('opacity-50');
         }
       });
-
-      function startRecording() {
-        // Capture canvas video stream at 30 FPS
-        const canvasStream = renderCanvas.captureStream(30);
-
-        // Combine Video and Audio tracks
-        const audioTracks = audioDest.stream.getAudioTracks();
-        const combinedStream = new MediaStream([
-          ...canvasStream.getVideoTracks(),
-          ...audioTracks,
-        ]);
-
-        const mimeType = getSupportedMimeType();
-
-        mediaRecorder = new MediaRecorder(combinedStream, {
-          mimeType: mimeType,
-          videoBitsPerSecond: 5000000, // 5Mbps for decent quality
-        });
-
-        recordedChunks = [];
-
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data && e.data.size > 0) {
-            recordedChunks.push(e.data);
-          }
-        };
-
-        mediaRecorder.onstop = finalizeVideo;
-
-        // Start recording
-        mediaRecorder.start();
-
-        // Hide overlay to show preview
-        statusOverlay.classList.add('opacity-0', 'pointer-events-none');
-
-        // Begin sequence
-        playNextVideo(0);
-      }
-
-      function playNextVideo(index) {
-        if (index >= selectedFiles.length) {
-          // All videos finished
-          mediaRecorder.stop();
-          return;
-        }
-
-        statusOverlay.classList.remove('opacity-0', 'pointer-events-none');
-        statusText.textContent = 'Processing...';
-        progressText.textContent = `${index + 1} / ${selectedFiles.length}`;
-        setTimeout(() => {
-          statusOverlay.classList.add('opacity-0', 'pointer-events-none');
-        }, 800);
-
-        const currentFile = selectedFiles[index];
-        const fileURL = URL.createObjectURL(currentFile);
-
-        sourceVideo.src = fileURL;
-        sourceVideo.load();
-
-        sourceVideo.onloadedmetadata = () => {
-          sourceVideo
-            .play()
-            .then(() => {
-              drawFrame();
-            })
-            .catch((err) => {
-              console.error('Playback failed', err);
-              // Skip to next if autoplay fails
-              playNextVideo(index + 1);
-            });
-        };
-
-        sourceVideo.onended = () => {
-          cancelAnimationFrame(cancelAnimationId);
-          URL.revokeObjectURL(fileURL); // Clean up memory
-          playNextVideo(index + 1);
-        };
-      }
-
-      function drawFrame() {
-        if (sourceVideo.paused || sourceVideo.ended) return;
-
-        // Calculate aspect ratio to fit (contain/letterbox)
-        const vRatio = CANVAS_WIDTH / sourceVideo.videoWidth;
-        const hRatio = CANVAS_HEIGHT / sourceVideo.videoHeight;
-        const ratio = Math.min(vRatio, hRatio);
-
-        const drawWidth = sourceVideo.videoWidth * ratio;
-        const drawHeight = sourceVideo.videoHeight * ratio;
-        const shiftX = (CANVAS_WIDTH - drawWidth) / 2;
-        const shiftY = (CANVAS_HEIGHT - drawHeight) / 2;
-
-        // Clear frame
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        // Draw video frame
-        ctx.drawImage(
-          sourceVideo,
-          0,
-          0,
-          sourceVideo.videoWidth,
-          sourceVideo.videoHeight,
-          shiftX,
-          shiftY,
-          drawWidth,
-          drawHeight
-        );
-
-        cancelAnimationId = requestAnimationFrame(drawFrame);
-      }
-
-      function finalizeVideo() {
-        isProcessing = false;
-
-        // Stop all tracks to free up camera/memory
-        if (mediaRecorder && mediaRecorder.stream) {
-          mediaRecorder.stream.getTracks().forEach((t) => t.stop());
-        }
-
-        // Create Blob
-        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
-        const finalURL = URL.createObjectURL(blob);
-
-        // Update UI
-        previewContainer.classList.add('hidden');
-        resultContainer.classList.remove('hidden');
-        fileListContainer.classList.add('hidden');
-
-        // Set download link attributes
-        const extension = mediaRecorder.mimeType.includes('mp4')
-          ? 'mp4'
-          : 'webm';
-        downloadLink.href = finalURL;
-        downloadLink.download = `merged_video_${Date.now()}.${extension}`;
-      }
     </script>
   </body>
 </html>
